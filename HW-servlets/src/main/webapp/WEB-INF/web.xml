@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<web-app>
+    <servlet>
+        <servlet-name>cookieServlet</servlet-name>
+        <servlet-class>it.sevenbits.servlet.cookieservlet.servlets.identification.CookieServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>cookieServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>rootServlet</servlet-name>
+        <servlet-class>it.sevenbits.courses.workshop.servlet.servlets.TasksServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>taskServlet</servlet-name>
+        <servlet-class>it.sevenbits.courses.workshop.servlet.servlets.TaskServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rootServlet</servlet-name>
+        <url-pattern>/tasks</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>taskServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
