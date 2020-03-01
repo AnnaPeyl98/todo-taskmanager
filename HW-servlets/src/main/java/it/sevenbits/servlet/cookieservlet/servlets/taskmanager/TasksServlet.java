@@ -36,7 +36,7 @@ public class TasksServlet extends HttpServlet {
      * @throws IOException if was trouble with writer
      */
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id = request.getHeader("Authorization");
         if (id == null) {
@@ -61,7 +61,7 @@ public class TasksServlet extends HttpServlet {
      * @throws IOException if was trouble with writer
      */
     @Override
-    protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws SecurityException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws SecurityException, IOException {
         String id = request.getHeader("Authorization");
         if (id == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized in service");
@@ -71,11 +71,7 @@ public class TasksServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return;
         }
-        String jsonRequest = request.getParameter("application/json");
-        if (jsonRequest == null || "".equals(jsonRequest)) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Not task");
-            return;
-        }
+        request.getParameter("application/json");
         BufferedReader reader = request.getReader();
         Gson gson = new Gson();
         Task task = gson.fromJson(reader, Task.class);

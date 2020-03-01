@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <packaging>war</packaging>
-    <name>cookieServlet</name>
+    <name>authServlet</name>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>

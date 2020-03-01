@@ -6,22 +6,22 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>cookieServlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/cookie/</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>rootServlet</servlet-name>
-        <servlet-class>it.sevenbits.courses.workshop.servlet.servlets.TasksServlet</servlet-class>
+        <servlet-name>tasksServlet</servlet-name>
+        <servlet-class>it.sevenbits.servlet.cookieservlet.servlets.taskmanager.TasksServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>taskServlet</servlet-name>
-        <servlet-class>it.sevenbits.courses.workshop.servlet.servlets.TaskServlet</servlet-class>
+        <servlet-class>it.sevenbits.servlet.cookieservlet.servlets.taskmanager.TaskServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>rootServlet</servlet-name>
-        <url-pattern>/tasks</url-pattern>
+        <servlet-name>tasksServlet</servlet-name>
+        <url-pattern>/tasks/</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>taskServlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/task/</url-pattern>
     </servlet-mapping>
 </web-app>
