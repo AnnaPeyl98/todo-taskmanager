@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<web-app>
+    <servlet>
+        <servlet-name>rootServlet</servlet-name>
+        <servlet-class>it.sevenbits.courses.workshop.servlet.TasksServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rootServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

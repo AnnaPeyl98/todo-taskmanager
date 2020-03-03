@@ -1,0 +1,4 @@
+it/sevenbits/courses/workshop/servlet/repository/TasksRepository.class
+it/sevenbits/courses/workshop/servlet/repository/Task.class
+it/sevenbits/courses/workshop/servlet/servlets/TaskServlet.class
+it/sevenbits/courses/workshop/servlet/servlets/TasksServlet.class
