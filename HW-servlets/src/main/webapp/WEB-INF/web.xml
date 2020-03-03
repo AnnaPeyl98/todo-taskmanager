@@ -6,7 +6,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>cookieServlet</servlet-name>
-        <url-pattern>/cookie/</url-pattern>
+        <url-pattern>/cookie</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>tasksServlet</servlet-name>
@@ -18,10 +18,10 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>tasksServlet</servlet-name>
-        <url-pattern>/tasks/</url-pattern>
+        <url-pattern>/tasks</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>taskServlet</servlet-name>
-        <url-pattern>/task/</url-pattern>
+        <url-pattern>/task</url-pattern>
     </servlet-mapping>
 </web-app>

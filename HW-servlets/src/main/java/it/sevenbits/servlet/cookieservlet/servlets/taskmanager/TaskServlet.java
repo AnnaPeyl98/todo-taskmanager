@@ -2,6 +2,7 @@ package it.sevenbits.servlet.cookieservlet.servlets.taskmanager;
 
 import com.google.gson.Gson;
 import it.sevenbits.servlet.cookieservlet.repository.identification.SessionMap;
+import it.sevenbits.servlet.cookieservlet.repository.taskmanager.Task;
 import it.sevenbits.servlet.cookieservlet.repository.taskmanager.TasksRepository;
 
 import javax.servlet.http.HttpServlet;
@@ -53,11 +54,12 @@ public class TaskServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         Gson json = new Gson();
-        String findTask = json.toJson(tasksRepository.getTask(Integer.parseInt(id)));
-        if (findTask == null || "".equals(findTask)) {
-            response.sendError(HttpServletResponse.SC_FOUND, "Not found task");
+        Task findTask = tasksRepository.getTask(Integer.parseInt(id));
+        if (findTask == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Task not found");
+            return;
         }
-        response.getWriter().write(findTask);
-        response.sendError(HttpServletResponse.SC_OK);
+        response.getWriter().write(json.toJson(findTask));
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

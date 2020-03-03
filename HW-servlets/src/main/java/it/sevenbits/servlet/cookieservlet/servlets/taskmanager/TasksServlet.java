@@ -18,6 +18,7 @@ import java.io.IOException;
 public class TasksServlet extends HttpServlet {
     private TasksRepository tasksRepository;
     private SessionMap sessionMap;
+    private int count = 0;
 
     /**
      * Initialization server
@@ -30,10 +31,11 @@ public class TasksServlet extends HttpServlet {
 
     /**
      * Get all tasks in repository
-     * @param request request object
+     *
+     * @param request  request object
      * @param response response object
      * @throws ServletException if was some trouble
-     * @throws IOException if was trouble with writer
+     * @throws IOException      if was trouble with writer
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,15 +52,16 @@ public class TasksServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(tasksRepository.toString());
-        response.sendError(HttpServletResponse.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**
      * Add task in repository
-     * @param request request object
+     *
+     * @param request  request object
      * @param response response object
      * @throws ServletException if was some trouble
-     * @throws IOException if was trouble with writer
+     * @throws IOException      if was trouble with writer
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws SecurityException, IOException {
@@ -71,7 +74,7 @@ public class TasksServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return;
         }
-        request.getParameter("application/json");
+        /*request.getParameter("application/json");
         BufferedReader reader = request.getReader();
         Gson gson = new Gson();
         Task task = gson.fromJson(reader, Task.class);
@@ -79,6 +82,18 @@ public class TasksServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         tasksRepository.addTask(task.getTask());
         response.getWriter().write("Created task");
-        response.sendError(HttpServletResponse.SC_OK);
+        response.sendError(HttpServletResponse.SC_OK);*/
+        request.getParameter("application/json");
+        BufferedReader reader = request.getReader();
+        Gson gson = new Gson();
+        Task task = gson.fromJson(reader, Task.class);
+        task.setId(count);
+        count++;
+        TasksRepository tasksRepository = TasksRepository.getInstance();
+        tasksRepository.addTask(task);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(gson.toJson(task));
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

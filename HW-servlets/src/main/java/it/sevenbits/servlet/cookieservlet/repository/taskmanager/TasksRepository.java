@@ -23,16 +23,17 @@ public final class TasksRepository {
 
     /**
      * Added task in repository
-     * @param s task, which will be added in repository
+     *
+     * @param task task, which will be added in repository
      */
-    public void addTask(final String s) {
+    public void addTask(final Task task) {
 
-        tasks.put(count, new Task(s, count));
-        count++;
+        tasks.put(task.getId(), task);
     }
 
     /**
      * Get repository or created it
+     *
      * @return repository for tasks
      */
     public static TasksRepository getInstance() {
@@ -44,6 +45,7 @@ public final class TasksRepository {
 
     /**
      * Get task for id
+     *
      * @param id id for task
      * @return task
      */
@@ -53,6 +55,7 @@ public final class TasksRepository {
 
     /**
      * Convert repository to string array json
+     *
      * @return string array json
      */
     public String toString() {

@@ -45,7 +45,7 @@ public class CookieServlet extends HttpServlet {
         Cookie cookie = new Cookie("sessionId", uuid);
         response.addCookie(cookie);
         response.setContentType("application/json");
-        response.sendError(HttpServletResponse.SC_CREATED);
+        response.setStatus(HttpServletResponse.SC_CREATED);
     }
 
     /**
