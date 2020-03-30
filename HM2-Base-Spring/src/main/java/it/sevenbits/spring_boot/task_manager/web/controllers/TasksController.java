@@ -6,6 +6,7 @@ import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 
@@ -21,6 +23,7 @@ import java.util.List;
  * Class for working with URL and repository
  */
 @Controller
+@Validated
 @RequestMapping("/tasks")
 public class TasksController {
     private TaskService taskService;
@@ -81,7 +84,10 @@ public class TasksController {
             consumes = "application/json",
             produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Task> taskForId(@PathVariable("id") final String id) {
+    public ResponseEntity<Task> taskForId(
+            @PathVariable("id")
+            @Valid
+            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}") final String id) {
         return taskService.getTask(id);
 
     }
@@ -99,7 +105,11 @@ public class TasksController {
             consumes = "application/json",
             produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> changeStatus(@PathVariable("id") final String id, @RequestBody @Valid final UpdateTaskRequest task) {
+    public ResponseEntity<String> changeStatus(
+            @PathVariable("id")
+            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
+            @Valid final String id,
+            @RequestBody @Valid final UpdateTaskRequest task) {
         return taskService.updateTask(id, task);
     }
 
@@ -116,7 +126,10 @@ public class TasksController {
             produces = "application/json"
     )
     @ResponseBody
-    public ResponseEntity<String> deleteTask(@PathVariable("id") final String id) {
+    public ResponseEntity<String> deleteTask(
+            @PathVariable("id")
+            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
+            @Valid final String id) {
         return taskService.deleteTask(id);
     }
 }
