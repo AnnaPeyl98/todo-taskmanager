@@ -1,6 +1,8 @@
 package it.sevenbits.spring_boot.task_manager.core.repository;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
+import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public interface TasksRepository {
      *
      * @return all tasks
      */
-    List getAllTasks();
+    List<Task> getAllTasks(String filter);
 
     /**
      * Method for added task in repository
@@ -21,7 +23,7 @@ public interface TasksRepository {
      * @param task - it will add
      * @return added task
      */
-    Task create(Task task);
+    Task create(AddTaskRequest task);
 
     /**
      * Getter task for this id
@@ -38,4 +40,6 @@ public interface TasksRepository {
      * @return deleted task
      */
     Task deleteTask(String id);
+
+    Task updateTask(String id, UpdateTaskRequest updateTask);
 }

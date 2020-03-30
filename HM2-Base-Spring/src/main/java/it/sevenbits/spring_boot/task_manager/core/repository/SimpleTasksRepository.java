@@ -1,12 +1,14 @@
 package it.sevenbits.spring_boot.task_manager.core.repository;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
+import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Realisation TasksRepository, saved all added tasks
@@ -18,8 +20,8 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return all tasks
      */
     @Override
-    public List<Task> getAllTasks() {
-        return Collections.unmodifiableList(new ArrayList<>(tasks.values()));
+    public List<Task> getAllTasks(String filter) {
+        return new ArrayList<>(tasks.values()).stream().filter(i->i.getStatus().equals(filter)).collect(Collectors.toList());
     }
 
     /**
@@ -28,7 +30,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return added task
      */
     @Override
-    public Task create(final Task task) {
+    public Task create(final AddTaskRequest task) {
         Task newTask = new Task(task.getText());
         tasks.put(newTask.getId(), newTask);
         return newTask;
@@ -53,5 +55,16 @@ public class SimpleTasksRepository implements TasksRepository {
     @Override
     public Task deleteTask(final String id) {
         return tasks.remove(id);
+    }
+
+    @Override
+    public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
+        Task findTask = getTask(id);
+        if(findTask==null){
+            return null;
+        }
+        findTask.setStatus(updateTask.getStatus());
+        findTask.setText(updateTask.getText());
+        return findTask;
     }
 }

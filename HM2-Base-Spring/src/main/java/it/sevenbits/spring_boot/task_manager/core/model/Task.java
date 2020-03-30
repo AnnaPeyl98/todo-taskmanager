@@ -69,4 +69,7 @@ public class Task {
     public void setStatus(final String status) {
         this.status = status;
     }
+    public void setText(final String text){
+        this.text=text;
+    }
 }
