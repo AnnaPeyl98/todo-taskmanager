@@ -12,7 +12,7 @@ import java.util.List;
 public interface TasksRepository {
     /**
      * Method for getting all tasks in repository
-     *
+     * @param filter filter for status
      * @return all tasks
      */
     List<Task> getAllTasks(String filter);
@@ -41,5 +41,12 @@ public interface TasksRepository {
      */
     Task deleteTask(String id);
 
+    /**
+     * Update task in repository
+     *
+     * @param id         id task, which will be update
+     * @param updateTask new informations
+     * @return updated task
+     */
     Task updateTask(String id, UpdateTaskRequest updateTask);
 }

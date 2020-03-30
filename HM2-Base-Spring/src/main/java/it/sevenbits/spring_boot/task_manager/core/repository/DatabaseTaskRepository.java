@@ -3,18 +3,24 @@ package it.sevenbits.spring_boot.task_manager.core.repository;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
- * Realisation TasksRepository, saved all added tasks
+ * Repository for working with database
  */
-public class SimpleTasksRepository implements TasksRepository {
-    private Map<String, Task> tasks = new HashMap<>();
+public class DatabaseTaskRepository implements TasksRepository {
+    private JdbcOperations jdbcOperations;
+
+    /**
+     * Create repository
+     * @param jdbcOperations object for working with database
+     */
+    public DatabaseTaskRepository(final JdbcOperations jdbcOperations) {
+        this.jdbcOperations = jdbcOperations;
+    }
 
     /**
      * Method for getting all tasks in repository
@@ -23,7 +29,15 @@ public class SimpleTasksRepository implements TasksRepository {
      */
     @Override
     public List<Task> getAllTasks(final String filter) {
-        return new ArrayList<>(tasks.values()).stream().filter(i -> i.getStatus().equals(filter)).collect(Collectors.toList());
+        return jdbcOperations.query(
+                "SELECT id, text, status, createAt FROM task",
+                (resultSet, i) -> {
+                    String id = resultSet.getString(1);
+                    String text = resultSet.getString(2);
+                    String status = resultSet.getString(3);
+                    Date createAt = resultSet.getDate(4);
+                    return new Task(id, text, status, createAt);
+                });
     }
 
     /**
@@ -35,7 +49,14 @@ public class SimpleTasksRepository implements TasksRepository {
     @Override
     public Task create(final AddTaskRequest task) {
         Task newTask = new Task(task.getText());
-        tasks.put(newTask.getId(), newTask);
+        String id = newTask.getId();
+        String text = newTask.getText();
+        String status = newTask.getStatus();
+        Date createAt = newTask.getCreateAt();
+        jdbcOperations.update(
+                "INSERT INTO task (id, text, status, createAt) VALUES (?, ?, ?, ?)",
+                id, text, status, createAt
+        );
         return newTask;
     }
 
@@ -47,7 +68,7 @@ public class SimpleTasksRepository implements TasksRepository {
      */
     @Override
     public Task getTask(final String id) {
-        return tasks.get(id);
+        return null;
     }
 
     /**
@@ -58,7 +79,7 @@ public class SimpleTasksRepository implements TasksRepository {
      */
     @Override
     public Task deleteTask(final String id) {
-        return tasks.remove(id);
+        return null;
     }
 
     /**
@@ -70,12 +91,6 @@ public class SimpleTasksRepository implements TasksRepository {
      */
     @Override
     public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
-        Task findTask = getTask(id);
-        if (findTask == null) {
-            return null;
-        }
-        findTask.setStatus(updateTask.getStatus());
-        findTask.setText(updateTask.getText());
-        return findTask;
+        return null;
     }
 }

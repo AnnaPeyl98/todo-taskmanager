@@ -12,10 +12,10 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * Service for working with map repository
+ * Service for working with repository
  */
 @Service
-public class MapTaskService implements TaskService {
+public class DataBaseService implements TaskService {
     private final TasksRepository tasksRepository;
 
     /**
@@ -23,7 +23,7 @@ public class MapTaskService implements TaskService {
      *
      * @param tasksRepository repository for this service
      */
-    public MapTaskService(final TasksRepository tasksRepository) {
+    public DataBaseService(final TasksRepository tasksRepository) {
         this.tasksRepository = tasksRepository;
     }
 
@@ -66,15 +66,7 @@ public class MapTaskService implements TaskService {
      */
     @Override
     public ResponseEntity<Task> getTask(final String id) {
-        Task findTask = tasksRepository.getTask(id);
-        if (findTask == null) {
-            return ResponseEntity
-                    .notFound()
-                    .build();
-        }
-        return ResponseEntity
-                .ok()
-                .body(findTask);
+        return null;
     }
 
     /**
@@ -86,20 +78,7 @@ public class MapTaskService implements TaskService {
      */
     @Override
     public ResponseEntity<String> updateTask(final String id, final UpdateTaskRequest updateTask) {
-        String status = updateTask.getStatus();
-        if (status.equals("inbox") || status.equals("done")) {
-            Task findTask = tasksRepository.updateTask(id, updateTask);
-            if (findTask == null) {
-                return ResponseEntity
-                        .notFound()
-                        .build();
-            }
-            return ResponseEntity
-                    .ok("{}");
-        }
-        return ResponseEntity
-                .badRequest()
-                .build();
+        return null;
     }
 
     /**
@@ -110,13 +89,6 @@ public class MapTaskService implements TaskService {
      */
     @Override
     public ResponseEntity<String> deleteTask(final String id) {
-        Task deleteTask = tasksRepository.deleteTask(id);
-        if (deleteTask == null || !deleteTask.getId().equals(id)) {
-            return ResponseEntity
-                    .notFound()
-                    .build();
-        }
-        return ResponseEntity
-                .ok("{}");
+        return null;
     }
 }

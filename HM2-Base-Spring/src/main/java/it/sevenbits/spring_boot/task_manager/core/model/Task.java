@@ -3,6 +3,8 @@ package it.sevenbits.spring_boot.task_manager.core.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -12,6 +14,7 @@ public class Task {
     private String id;
     private String text;
     private String status;
+    private Date createAt;
 
     /**
      * Created task
@@ -19,10 +22,31 @@ public class Task {
      * @param text - text for this task
      */
     @JsonCreator
-    public Task(@JsonProperty("text") String text) {
+    public Task(@JsonProperty("text") final String text) {
         this.id = createId();
         this.text = text;
         this.status = "inbox";
+        createAt = new Date();
+    }
+
+    /**
+     * Created task
+     *
+     * @param id       id task
+     * @param text     text task
+     * @param status   status task
+     * @param createAt date create task
+     */
+    @JsonCreator
+    public Task(@JsonProperty("id") final String id,
+                @JsonProperty("text") final String text,
+                @JsonProperty("status") final String status,
+                @JsonProperty("createAt") final Date createAt
+    ) {
+        this.id = id;
+        this.text = text;
+        this.status = status;
+        this.createAt = createAt;
     }
 
     /**
@@ -69,7 +93,21 @@ public class Task {
     public void setStatus(final String status) {
         this.status = status;
     }
-    public void setText(final String text){
-        this.text=text;
+
+    /**
+     * Set text in task
+     *
+     * @param text new text
+     */
+    public void setText(final String text) {
+        this.text = text;
+    }
+
+    /**
+     * Get date create task
+     * @return date create task
+     */
+    public Date getCreateAt() {
+        return createAt;
     }
 }
