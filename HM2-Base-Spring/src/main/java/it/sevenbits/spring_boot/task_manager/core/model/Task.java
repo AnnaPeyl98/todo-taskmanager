@@ -15,6 +15,7 @@ public class Task {
     private String text;
     private String status;
     private Date createAt;
+    private Date updateAt;
 
     /**
      * Created task
@@ -27,6 +28,7 @@ public class Task {
         this.text = text;
         this.status = "inbox";
         createAt = new Date();
+        updateAt = createAt;
     }
 
     /**
@@ -36,17 +38,20 @@ public class Task {
      * @param text     text task
      * @param status   status task
      * @param createAt date create task
+     * @param updateAt date update
      */
     @JsonCreator
     public Task(@JsonProperty("id") final String id,
                 @JsonProperty("text") final String text,
                 @JsonProperty("status") final String status,
-                @JsonProperty("createAt") final Date createAt
+                @JsonProperty("createAt") final Date createAt,
+                @JsonProperty("updateAt") final Date updateAt
     ) {
         this.id = id;
         this.text = text;
         this.status = status;
         this.createAt = createAt;
+        this.updateAt = updateAt;
     }
 
     /**
@@ -105,9 +110,26 @@ public class Task {
 
     /**
      * Get date create task
+     *
      * @return date create task
      */
     public Date getCreateAt() {
         return createAt;
+    }
+
+    /**
+     * get last update date
+     *
+     * @return last update date
+     */
+    public Date getUpdateAt() {
+        return updateAt;
+    }
+
+    /**
+     * set new update date
+     */
+    public void setUpdateAt() {
+        this.updateAt = new Date();
     }
 }

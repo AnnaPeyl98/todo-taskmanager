@@ -1,0 +1,3 @@
+ALTER TABLE task ADD COLUMN updateAt VARCHAR NULL;
+UPDATE task SET updateAt = createAt WHERE updateAt IS NULL;
+ALTER TABLE task ALTER COLUMN updateAt SET NOT NULL;

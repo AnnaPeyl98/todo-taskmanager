@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import java.net.URI;
 import java.util.List;
 
 
@@ -49,12 +51,14 @@ public class TasksController {
             produces = "application/json")
     @ResponseBody
     public ResponseEntity<List<Task>> listTasks(@RequestParam(name = "status") final String status) {
-        if ("done".equals(status) || "inbox".equals(status)) {
-            return taskService.getAllTasks(status);
+        List<Task> taskList = taskService.getAllTasks(status);
+        if (taskList == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
         }
-        return ResponseEntity
-                .badRequest()
-                .build();
+        return ResponseEntity.ok().body(taskList);
+
     }
 
     /**
@@ -69,7 +73,14 @@ public class TasksController {
             produces = "application/json")
     @ResponseBody
     public ResponseEntity<Task> create(@RequestBody @Valid final AddTaskRequest newTask) {
-        return taskService.createTask(newTask);
+        Task createdTask = taskService.createTask(newTask);
+        URI location = UriComponentsBuilder.fromPath("/tasks/")
+                .path(String.valueOf(createdTask.getId()))
+                .build()
+                .toUri();
+        return ResponseEntity.ok()
+                .location(location)
+                .body(createdTask);
     }
 
     /**
@@ -88,7 +99,15 @@ public class TasksController {
             @PathVariable("id")
             @Valid
             @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}") final String id) {
-        return taskService.getTask(id);
+        Task findTask = taskService.getTask(id);
+        if (findTask == null) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+        return ResponseEntity
+                .ok()
+                .body(findTask);
 
     }
 
@@ -105,12 +124,26 @@ public class TasksController {
             consumes = "application/json",
             produces = "application/json")
     @ResponseBody
-    public ResponseEntity<String> changeStatus(
+    public ResponseEntity<Void> changeStatus(
             @PathVariable("id")
             @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
             @Valid final String id,
             @RequestBody @Valid final UpdateTaskRequest task) {
-        return taskService.updateTask(id, task);
+        String status = task.getStatus();
+        if (status.equals("inbox") || status.equals("done")) {
+            Task findTask = taskService.updateTask(id, task);
+            if (findTask == null) {
+                return ResponseEntity
+                        .notFound()
+                        .build();
+            }
+            return ResponseEntity
+                    .ok()
+                    .build();
+        }
+        return ResponseEntity
+                .badRequest()
+                .build();
     }
 
     /**
@@ -126,10 +159,18 @@ public class TasksController {
             produces = "application/json"
     )
     @ResponseBody
-    public ResponseEntity<String> deleteTask(
+    public ResponseEntity<Void> deleteTask(
             @PathVariable("id")
             @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
             @Valid final String id) {
-        return taskService.deleteTask(id);
+        Task deleteTask = taskService.deleteTask(id);
+        if (deleteTask == null) {
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+        return ResponseEntity
+                .ok()
+                .build();
     }
 }

@@ -16,6 +16,7 @@ public class DatabaseTaskRepository implements TasksRepository {
 
     /**
      * Create repository
+     *
      * @param jdbcOperations object for working with database
      */
     public DatabaseTaskRepository(final JdbcOperations jdbcOperations) {
@@ -30,14 +31,16 @@ public class DatabaseTaskRepository implements TasksRepository {
     @Override
     public List<Task> getAllTasks(final String filter) {
         return jdbcOperations.query(
-                "SELECT id, text, status, createAt FROM task",
+                "SELECT id, text, status, createAt, updateAt FROM task WHERE status = ?",
                 (resultSet, i) -> {
                     String id = resultSet.getString(1);
                     String text = resultSet.getString(2);
                     String status = resultSet.getString(3);
                     Date createAt = resultSet.getDate(4);
-                    return new Task(id, text, status, createAt);
-                });
+                    Date updateAt = resultSet.getDate(5);
+                    return new Task(id, text, status, createAt, updateAt);
+                },
+                filter);
     }
 
     /**
@@ -53,9 +56,10 @@ public class DatabaseTaskRepository implements TasksRepository {
         String text = newTask.getText();
         String status = newTask.getStatus();
         Date createAt = newTask.getCreateAt();
+        Date updateAt = newTask.getUpdateAt();
         jdbcOperations.update(
-                "INSERT INTO task (id, text, status, createAt) VALUES (?, ?, ?, ?)",
-                id, text, status, createAt
+                "INSERT INTO task (id, text, status, createAt, updateAt) VALUES (?, ?, ?, ?, ?)",
+                id, text, status, createAt, updateAt
         );
         return newTask;
     }
@@ -68,7 +72,18 @@ public class DatabaseTaskRepository implements TasksRepository {
      */
     @Override
     public Task getTask(final String id) {
-        return null;
+        return jdbcOperations.queryForObject(
+                "SELECT id, text, status, createAt, updateAt FROM task WHERE id = ?",
+                (resultSet, i) -> {
+                    String rowId = resultSet.getString(1);
+                    String rowText = resultSet.getString(2);
+                    String rowStatus = resultSet.getString(3);
+                    Date rowCreateAt = resultSet.getDate(4);
+                    Date rowUpdateAt = resultSet.getDate(5);
+                    return new Task(rowId, rowText, rowStatus, rowCreateAt, rowUpdateAt);
+                },
+                id);
+
     }
 
     /**
@@ -79,7 +94,10 @@ public class DatabaseTaskRepository implements TasksRepository {
      */
     @Override
     public Task deleteTask(final String id) {
-        return null;
+        Task deleteTask = getTask(id);
+        jdbcOperations.update(
+                "DELETE FROM task WHERE id = ?", id);
+        return deleteTask;
     }
 
     /**
@@ -91,6 +109,17 @@ public class DatabaseTaskRepository implements TasksRepository {
      */
     @Override
     public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
-        return null;
+        Task newTask = getTask(id);
+        newTask.setUpdateAt();
+        newTask.setText(updateTask.getText());
+        newTask.setStatus(updateTask.getStatus());
+        String text = newTask.getText();
+        String status = newTask.getStatus();
+        Date updateAt = newTask.getUpdateAt();
+        jdbcOperations.update(
+                "UPDATE task SET text = ?, status = ?, updateAt = ? WHERE id = ?",
+                text, status, updateAt, id
+        );
+        return newTask;
     }
 }

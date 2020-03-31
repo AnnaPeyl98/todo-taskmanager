@@ -4,11 +4,8 @@ import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.repository.TasksRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -34,10 +31,11 @@ public class DataBaseService implements TaskService {
      * @return response with all tasks
      */
     @Override
-    public ResponseEntity<List<Task>> getAllTasks(final String filter) {
-        return ResponseEntity
-                .ok()
-                .body(tasksRepository.getAllTasks(filter));
+    public List<Task> getAllTasks(final String filter) {
+        if ("done".equals(filter) || "inbox".equals(filter)) {
+            return tasksRepository.getAllTasks(filter);
+        }
+        return null;
     }
 
     /**
@@ -47,15 +45,9 @@ public class DataBaseService implements TaskService {
      * @return added task
      */
     @Override
-    public ResponseEntity<Task> createTask(final AddTaskRequest newTask) {
-        Task createdTask = tasksRepository.create(newTask);
-        URI location = UriComponentsBuilder.fromPath("/tasks/")
-                .path(String.valueOf(createdTask.getId()))
-                .build()
-                .toUri();
-        return ResponseEntity.ok()
-                .location(location)
-                .body(createdTask);
+    public Task createTask(final AddTaskRequest newTask) {
+        return tasksRepository.create(newTask);
+
     }
 
     /**
@@ -65,8 +57,9 @@ public class DataBaseService implements TaskService {
      * @return finded task
      */
     @Override
-    public ResponseEntity<Task> getTask(final String id) {
-        return null;
+    public Task getTask(final String id) {
+        return tasksRepository.getTask(id);
+
     }
 
     /**
@@ -77,8 +70,9 @@ public class DataBaseService implements TaskService {
      * @return empty json
      */
     @Override
-    public ResponseEntity<String> updateTask(final String id, final UpdateTaskRequest updateTask) {
-        return null;
+    public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
+        return tasksRepository.updateTask(id, updateTask);
+
     }
 
     /**
@@ -88,7 +82,11 @@ public class DataBaseService implements TaskService {
      * @return empty json
      */
     @Override
-    public ResponseEntity<String> deleteTask(final String id) {
-        return null;
+    public Task deleteTask(final String id) {
+        Task deleteTask = tasksRepository.deleteTask(id);
+        if (deleteTask == null || !deleteTask.getId().equals(id)) {
+            return null;
+        }
+        return deleteTask;
     }
 }

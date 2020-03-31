@@ -3,7 +3,6 @@ package it.sevenbits.spring_boot.task_manager.web.service;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public interface TaskService {
      * @param filter filter for status
      * @return response with all tasks
      */
-    ResponseEntity<List<Task>> getAllTasks(String filter);
+    List<Task> getAllTasks(String filter);
 
     /**
      * Method for adding task in repository creating response with added task
@@ -25,7 +24,7 @@ public interface TaskService {
      * @param newTask new task
      * @return added task
      */
-    ResponseEntity<Task> createTask(AddTaskRequest newTask);
+    Task createTask(AddTaskRequest newTask);
 
     /**
      * Method for get task
@@ -33,7 +32,7 @@ public interface TaskService {
      * @param id id task, which will be return
      * @return finded task
      */
-    ResponseEntity<Task> getTask(String id);
+    Task getTask(String id);
 
     /**
      * Method for update task in repository
@@ -42,7 +41,7 @@ public interface TaskService {
      * @param updateTask new information
      * @return empty json
      */
-    ResponseEntity<String> updateTask(String id, UpdateTaskRequest updateTask);
+    Task updateTask(String id, UpdateTaskRequest updateTask);
 
     /**
      * Method for delete task in repository
@@ -50,5 +49,5 @@ public interface TaskService {
      * @param id id task
      * @return empty json
      */
-    ResponseEntity<String> deleteTask(String id);
+    Task deleteTask(String id);
 }
