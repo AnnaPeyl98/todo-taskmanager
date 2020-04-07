@@ -13,6 +13,9 @@ public interface TasksRepository {
     /**
      * Method for getting all tasks in repository
      * @param filter filter for status
+     * @param order parameter for sort task
+     * @param page number page
+     * @param size count tasks on page
      * @return all tasks
      */
     List<Task> getAllTasks(String filter, String order, int page, int size);

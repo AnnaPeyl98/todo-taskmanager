@@ -25,7 +25,10 @@ public class DatabaseTaskRepository implements TasksRepository {
 
     /**
      * Method for getting all tasks in repository
-     *
+     * @param filter filter for status task
+     * @param order parameter for sort task
+     * @param page number page
+     * @param size count tasks on page
      * @return all tasks
      */
     @Override

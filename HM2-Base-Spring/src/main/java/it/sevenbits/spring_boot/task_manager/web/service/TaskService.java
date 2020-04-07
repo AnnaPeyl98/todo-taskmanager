@@ -14,6 +14,9 @@ public interface TaskService {
      * Method for creating response with all tasks
      *
      * @param filter filter for status
+     * @param order parameter for sort task
+     * @param page number page
+     * @param size count tasks on page
      * @return response with all tasks
      */
     List<Task> getAllTasks(String filter, String order, int page, int size);

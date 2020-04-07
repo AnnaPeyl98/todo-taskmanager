@@ -45,6 +45,9 @@ public class TasksController {
      * Method for getting all tasks in json
      *
      * @param status status for filter
+     * @param order parameter for sort task
+     * @param page number page
+     * @param size count tasks on page
      * @return all tasks
      */
     @RequestMapping(

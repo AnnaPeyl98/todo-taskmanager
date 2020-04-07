@@ -28,12 +28,15 @@ public class DataBaseService implements TaskService {
      * Method for creating response with all tasks
      *
      * @param filter filter for status
+     * @param order  parameter for sort task
+     * @param page   number page
+     * @param size   count tasks on page
      * @return response with all tasks
      */
     @Override
     public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
-        if ("done".equals(filter) || "inbox".equals(filter)||"desc".equals(order)||"asc".equals(order)) {
-            return tasksRepository.getAllTasks(filter, order, page,size);
+        if ("done".equals(filter) || "inbox".equals(filter) || "desc".equals(order) || "asc".equals(order)) {
+            return tasksRepository.getAllTasks(filter, order, page, size);
         }
         return null;
     }
