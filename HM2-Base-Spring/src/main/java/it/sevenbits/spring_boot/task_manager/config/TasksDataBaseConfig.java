@@ -43,5 +43,4 @@ public class TasksDataBaseConfig {
     ) {
         return new JdbcTemplate(tasksDataSource);
     }
-
 }

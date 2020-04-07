@@ -1,3 +1,3 @@
-ALTER TABLE task ADD COLUMN updateAt VARCHAR NULL;
-UPDATE task SET updateAt = createAt WHERE updateAt IS NULL;
-ALTER TABLE task ALTER COLUMN updateAt SET NOT NULL;
+ALTER TABLE task ADD COLUMN updatedAt VARCHAR NULL;
+UPDATE task SET updatedAt = createdAt WHERE updatedAt IS NULL;
+ALTER TABLE task ALTER COLUMN updatedAt SET NOT NULL;

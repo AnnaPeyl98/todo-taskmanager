@@ -22,7 +22,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter) {
+    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
         return new ArrayList<>(tasks.values()).stream().filter(i -> i.getStatus().equals(filter)).collect(Collectors.toList());
     }
 

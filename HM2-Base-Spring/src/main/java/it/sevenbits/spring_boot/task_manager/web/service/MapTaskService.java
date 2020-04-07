@@ -31,9 +31,9 @@ public class MapTaskService implements TaskService {
      * @return response with all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter) {
+    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
         if ("done".equals(filter) || "inbox".equals(filter)) {
-            return tasksRepository.getAllTasks(filter);
+            return tasksRepository.getAllTasks(filter, order, page, size);
         }
         return null;
     }

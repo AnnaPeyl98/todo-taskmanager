@@ -38,11 +38,14 @@ public class TaskControllerTest {
     @Test
     public void testListTasks() {
         String filter = "done";
+        String order = "asc";
+        int pages = 1;
+        int size = 30;
         List<Task> mockTask = mock(List.class);
-        when(mockDataBaseService.getAllTasks(filter)).thenReturn(mockTask);
+        when(mockDataBaseService.getAllTasks(filter, order, pages, size)).thenReturn(mockTask);
 
-        ResponseEntity<List<Task>> answer = tasksController.listTasks(filter);
-        verify(mockDataBaseService, times(1)).getAllTasks(filter);
+        ResponseEntity<List<Task>> answer = tasksController.listTasks(filter, order, pages, size);
+        verify(mockDataBaseService, times(1)).getAllTasks(filter, order, pages, size);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
         assertSame(mockTask, answer.getBody());
     }
@@ -107,5 +110,4 @@ public class TaskControllerTest {
         assertEquals(HttpStatus.OK, answer.getStatusCode());
         assertNull(answer.getBody());
     }
-
 }

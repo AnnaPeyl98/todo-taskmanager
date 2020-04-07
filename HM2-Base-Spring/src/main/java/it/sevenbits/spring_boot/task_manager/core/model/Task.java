@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,8 +15,8 @@ public class Task {
     private String id;
     private String text;
     private String status;
-    private Date createAt;
-    private Date updateAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     /**
      * Created task
@@ -27,8 +28,9 @@ public class Task {
         this.id = createId();
         this.text = text;
         this.status = "inbox";
-        createAt = new Date();
-        updateAt = createAt;
+        Date date = new Date();
+        createdAt = new Timestamp(date.getTime());
+        updatedAt = createdAt;
     }
 
     /**
@@ -44,14 +46,14 @@ public class Task {
     public Task(@JsonProperty("id") final String id,
                 @JsonProperty("text") final String text,
                 @JsonProperty("status") final String status,
-                @JsonProperty("createAt") final Date createAt,
-                @JsonProperty("updateAt") final Date updateAt
+                @JsonProperty("createdAt") final Timestamp createAt,
+                @JsonProperty("updatedAt") final Timestamp updateAt
     ) {
         this.id = id;
         this.text = text;
         this.status = status;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
+        this.createdAt = createAt;
+        this.updatedAt = updateAt;
     }
 
     /**
@@ -113,8 +115,8 @@ public class Task {
      *
      * @return date create task
      */
-    public Date getCreateAt() {
-        return createAt;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
     /**
@@ -122,14 +124,15 @@ public class Task {
      *
      * @return last update date
      */
-    public Date getUpdateAt() {
-        return updateAt;
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 
     /**
      * set new update date
      */
     public void setUpdateAt() {
-        this.updateAt = new Date();
+        Date date = new Date();
+        this.updatedAt = new Timestamp(date.getTime());
     }
 }

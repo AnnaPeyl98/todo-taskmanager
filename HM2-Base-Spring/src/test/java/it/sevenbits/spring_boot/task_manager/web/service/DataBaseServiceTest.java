@@ -29,11 +29,14 @@ public class DataBaseServiceTest {
     @Test
     public void testListTasks() {
         String filter = "inbox";
+        String order = "asc";
+        int pages = 1;
+        int size = 30;
         List<Task> mockListTasks = mock(List.class);
-        when(mockTaskRepository.getAllTasks(filter)).thenReturn(mockListTasks);
+        when(mockTaskRepository.getAllTasks(filter, order, pages,size)).thenReturn(mockListTasks);
 
-        List<Task> result = dataBaseService.getAllTasks(filter);
-        verify(mockTaskRepository, times(1)).getAllTasks(filter);
+        List<Task> result = dataBaseService.getAllTasks(filter, order, pages, size);
+        verify(mockTaskRepository, times(1)).getAllTasks(filter, order, pages, size);
         assertSame(mockListTasks, result);
     }
 

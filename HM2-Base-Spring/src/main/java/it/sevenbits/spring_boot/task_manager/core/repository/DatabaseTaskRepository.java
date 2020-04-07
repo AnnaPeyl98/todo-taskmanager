@@ -5,7 +5,7 @@ import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -29,18 +29,26 @@ public class DatabaseTaskRepository implements TasksRepository {
      * @return all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter) {
+    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
+        String ascQuery =
+                "SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt ASC OFFSET ? LIMIT ?";
+        String descQuery =
+                "SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt DESC OFFSET ? LIMIT ?";
+        String query = "asc".equalsIgnoreCase(order) ? ascQuery : descQuery;
+        int start = (page - 1) * size;
         return jdbcOperations.query(
-                "SELECT id, text, status, createAt, updateAt FROM task WHERE status = ?",
+                query,
                 (resultSet, i) -> {
                     String id = resultSet.getString(1);
                     String text = resultSet.getString(2);
                     String status = resultSet.getString(3);
-                    Date createAt = resultSet.getDate(4);
-                    Date updateAt = resultSet.getDate(5);
-                    return new Task(id, text, status, createAt, updateAt);
+                    Timestamp createdAt = new Timestamp(resultSet.getDate(4).getTime());
+                    Timestamp updatedAt = new Timestamp(resultSet.getDate(5).getTime());
+                    return new Task(id, text, status, createdAt, updatedAt);
                 },
-                filter);
+                filter,
+                start,
+                size);
     }
 
     /**
@@ -55,11 +63,11 @@ public class DatabaseTaskRepository implements TasksRepository {
         String id = newTask.getId();
         String text = newTask.getText();
         String status = newTask.getStatus();
-        Date createAt = newTask.getCreateAt();
-        Date updateAt = newTask.getUpdateAt();
+        Timestamp createdAt = newTask.getCreatedAt();
+        Timestamp updatedAt = newTask.getUpdatedAt();
         jdbcOperations.update(
-                "INSERT INTO task (id, text, status, createAt, updateAt) VALUES (?, ?, ?, ?, ?)",
-                id, text, status, createAt, updateAt
+                "INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
+                id, text, status, createdAt, updatedAt
         );
         return newTask;
     }
@@ -73,14 +81,14 @@ public class DatabaseTaskRepository implements TasksRepository {
     @Override
     public Task getTask(final String id) {
         return jdbcOperations.queryForObject(
-                "SELECT id, text, status, createAt, updateAt FROM task WHERE id = ?",
+                "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
                 (resultSet, i) -> {
                     String rowId = resultSet.getString(1);
                     String rowText = resultSet.getString(2);
                     String rowStatus = resultSet.getString(3);
-                    Date rowCreateAt = resultSet.getDate(4);
-                    Date rowUpdateAt = resultSet.getDate(5);
-                    return new Task(rowId, rowText, rowStatus, rowCreateAt, rowUpdateAt);
+                    Timestamp rowCreatedAt = new Timestamp(resultSet.getDate(4).getTime());
+                    Timestamp rowUpdatedAt = new Timestamp(resultSet.getDate(5).getTime());
+                    return new Task(rowId, rowText, rowStatus, rowCreatedAt, rowUpdatedAt);
                 },
                 id);
 
@@ -115,10 +123,10 @@ public class DatabaseTaskRepository implements TasksRepository {
         newTask.setStatus(updateTask.getStatus());
         String text = newTask.getText();
         String status = newTask.getStatus();
-        Date updateAt = newTask.getUpdateAt();
+        Timestamp updatedAt = newTask.getUpdatedAt();
         jdbcOperations.update(
-                "UPDATE task SET text = ?, status = ?, updateAt = ? WHERE id = ?",
-                text, status, updateAt, id
+                "UPDATE task SET text = ?, status = ?, updatedAt = ? WHERE id = ?",
+                text, status, updatedAt, id
         );
         return newTask;
     }

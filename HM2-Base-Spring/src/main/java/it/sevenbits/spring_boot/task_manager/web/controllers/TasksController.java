@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.List;
@@ -47,11 +49,18 @@ public class TasksController {
      */
     @RequestMapping(
             method = RequestMethod.GET,
-            consumes = "application/json",
             produces = "application/json")
     @ResponseBody
-    public ResponseEntity<List<Task>> listTasks(@RequestParam(name = "status") final String status) {
-        List<Task> taskList = taskService.getAllTasks(status);
+    public ResponseEntity<List<Task>> listTasks(@RequestParam(name = "status", defaultValue = "inbox") final String status,
+                                                @RequestParam(name = "order", defaultValue = "desc") final String order,
+                                                @RequestParam(name = "page", defaultValue = "1") final int page,
+                                                @Valid
+                                                @Min(10)
+                                                @Max(50)
+                                                @RequestParam(name = "size", defaultValue = "25") final int size
+
+    ) {
+        List<Task> taskList = taskService.getAllTasks(status, order, page, size);
         if (taskList == null) {
             return ResponseEntity
                     .badRequest()
@@ -92,7 +101,6 @@ public class TasksController {
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.GET,
-            consumes = "application/json",
             produces = "application/json")
     @ResponseBody
     public ResponseEntity<Task> taskForId(

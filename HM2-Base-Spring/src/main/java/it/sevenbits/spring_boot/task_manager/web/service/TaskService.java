@@ -16,7 +16,7 @@ public interface TaskService {
      * @param filter filter for status
      * @return response with all tasks
      */
-    List<Task> getAllTasks(String filter);
+    List<Task> getAllTasks(String filter, String order, int page, int size);
 
     /**
      * Method for adding task in repository creating response with added task

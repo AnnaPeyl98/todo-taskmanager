@@ -31,9 +31,9 @@ public class DataBaseService implements TaskService {
      * @return response with all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter) {
-        if ("done".equals(filter) || "inbox".equals(filter)) {
-            return tasksRepository.getAllTasks(filter);
+    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
+        if ("done".equals(filter) || "inbox".equals(filter)||"desc".equals(order)||"asc".equals(order)) {
+            return tasksRepository.getAllTasks(filter, order, page,size);
         }
         return null;
     }

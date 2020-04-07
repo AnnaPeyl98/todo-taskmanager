@@ -15,7 +15,7 @@ public interface TasksRepository {
      * @param filter filter for status
      * @return all tasks
      */
-    List<Task> getAllTasks(String filter);
+    List<Task> getAllTasks(String filter, String order, int page, int size);
 
     /**
      * Method for added task in repository
