@@ -1,8 +1,8 @@
-##TO-DO TASK MANAGER
+###TO-DO TASK MANAGER
 
 This application for work with your tasks.
 
-##INSTALLING
+###INSTALLING
 For working with this application you should install postgreSQL
 ```$xslt
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
@@ -25,7 +25,7 @@ Create users "anna" with password "anna" and give rights
 CREATE USER anna WITH ENCRYPTED PASSWORD 'anna';
 GRANT ALL PRIVILEGES ON DATABASE eisetasks TO anna;
 ```
-##RUN
+###RUN
 Enter in console in root directory
 ```
 mvn package
@@ -36,9 +36,9 @@ java -jar name_file.jar
 ```
 when name_file.jar - your jar-file this project.
 
-##API
+###API
 You can send the following requests:
-1. This request with method GET return all tasks
+1. **This request with method GET return all tasks**
     ```$xslt
     http://localhost:8080/tasks
     ```
@@ -61,7 +61,7 @@ You can send the following requests:
 
         The number of displayed tasks on one page. It can take values ​​from 10 to 50 inclusive. **The default value is 25.**
     
-2. This request with method POST add task in repository and return it
+2. **This request with method POST add task in repository and return it**
     ```
     http://localhost:8080/tasks
     ```
@@ -74,12 +74,12 @@ You can send the following requests:
 	    "status":"inbox"
     }
     ```
-3. This request with the GET method will return the task with the specified id, if the task is not found, then the code 404 will be returned
+3. **This request with the GET method will return the task with the specified id**, if the task is not found, then the code 404 will be returned
 
      ```
       http://localhost:8080/tasks/{id}
      ```
-4. This request with the PATCH method will correct the old status and the text for the new one in the task with the specified id, which you will send in the body of the request in json format.
+4. **This request with the PATCH** method will correct the old status and the text for the new one in the task with the specified id, which you will send in the body of the request in json format.
 
      ```
       http://localhost:8080/tasks/{id}
@@ -91,7 +91,7 @@ You can send the following requests:
         	"status":"done"
         }
      ```
-5. This request with the DELETE method will remove the task with the specified id from the repository
+5. **This request with the DELETE method will remove the task with the specified id from the repository**
     ```
       http://localhost:8080/tasks/{id}
      ```
