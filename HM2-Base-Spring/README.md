@@ -1,8 +1,8 @@
-###TO-DO TASK MANAGER
+## TO-DO TASK MANAGER
 
 This application for work with your tasks.
 
-###INSTALLING
+## INSTALLING
 For working with this application you should install postgreSQL
 ```$xslt
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
@@ -25,7 +25,7 @@ Create users "anna" with password "anna" and give rights
 CREATE USER anna WITH ENCRYPTED PASSWORD 'anna';
 GRANT ALL PRIVILEGES ON DATABASE eisetasks TO anna;
 ```
-###RUN
+## RUN
 Enter in console in root directory
 ```
 mvn package
@@ -36,7 +36,7 @@ java -jar name_file.jar
 ```
 when name_file.jar - your jar-file this project.
 
-###API
+## API
 You can send the following requests:
 1. **This request with method GET return all tasks**
     ```$xslt
