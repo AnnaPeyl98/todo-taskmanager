@@ -78,4 +78,13 @@ public class SimpleTasksRepository implements TasksRepository {
         findTask.setText(updateTask.getText());
         return findTask;
     }
+    /**
+     * Return count tasks in repository
+     * @param filter status tasks
+     * @return count tasks
+     */
+    @Override
+    public int getCountAllTasks(final String filter) {
+        return tasks.size();
+    }
 }

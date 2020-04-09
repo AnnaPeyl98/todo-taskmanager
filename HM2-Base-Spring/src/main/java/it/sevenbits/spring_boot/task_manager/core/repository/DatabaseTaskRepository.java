@@ -3,16 +3,23 @@ package it.sevenbits.spring_boot.task_manager.core.repository;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for working with database
  */
 public class DatabaseTaskRepository implements TasksRepository {
     private JdbcOperations jdbcOperations;
+    private static final int INDEX_ID = 1;
+    private static final int INDEX_TEXT = 2;
+    private static final int INDEX_STATUS = 3;
+    private static final int INDEX_CREATEDAT = 4;
+    private static final int INDEX_UPDATEDAT = 5;
 
     /**
      * Create repository
@@ -25,10 +32,11 @@ public class DatabaseTaskRepository implements TasksRepository {
 
     /**
      * Method for getting all tasks in repository
+     *
      * @param filter filter for status task
-     * @param order parameter for sort task
-     * @param page number page
-     * @param size count tasks on page
+     * @param order  parameter for sort task
+     * @param page   number page
+     * @param size   count tasks on page
      * @return all tasks
      */
     @Override
@@ -42,11 +50,11 @@ public class DatabaseTaskRepository implements TasksRepository {
         return jdbcOperations.query(
                 query,
                 (resultSet, i) -> {
-                    String id = resultSet.getString(1);
-                    String text = resultSet.getString(2);
-                    String status = resultSet.getString(3);
-                    Timestamp createdAt = new Timestamp(resultSet.getDate(4).getTime());
-                    Timestamp updatedAt = new Timestamp(resultSet.getDate(5).getTime());
+                    String id = resultSet.getString(INDEX_ID);
+                    String text = resultSet.getString(INDEX_TEXT);
+                    String status = resultSet.getString(INDEX_STATUS);
+                    Timestamp createdAt = new Timestamp(resultSet.getDate(INDEX_CREATEDAT).getTime());
+                    Timestamp updatedAt = new Timestamp(resultSet.getDate(INDEX_UPDATEDAT).getTime());
                     return new Task(id, text, status, createdAt, updatedAt);
                 },
                 filter,
@@ -83,17 +91,23 @@ public class DatabaseTaskRepository implements TasksRepository {
      */
     @Override
     public Task getTask(final String id) {
-        return jdbcOperations.queryForObject(
-                "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
-                (resultSet, i) -> {
-                    String rowId = resultSet.getString(1);
-                    String rowText = resultSet.getString(2);
-                    String rowStatus = resultSet.getString(3);
-                    Timestamp rowCreatedAt = new Timestamp(resultSet.getDate(4).getTime());
-                    Timestamp rowUpdatedAt = new Timestamp(resultSet.getDate(5).getTime());
-                    return new Task(rowId, rowText, rowStatus, rowCreatedAt, rowUpdatedAt);
-                },
-                id);
+        try {
+
+            return jdbcOperations.queryForObject(
+                    "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
+                    (resultSet, i) -> {
+                        String rowId = resultSet.getString(INDEX_ID);
+                        String rowText = resultSet.getString(INDEX_TEXT);
+                        String rowStatus = resultSet.getString(INDEX_STATUS);
+                        Timestamp rowCreatedAt = new Timestamp(resultSet.getDate(INDEX_CREATEDAT).getTime());
+                        Timestamp rowUpdatedAt = new Timestamp(resultSet.getDate(INDEX_UPDATEDAT).getTime());
+                        return new Task(rowId, rowText, rowStatus, rowCreatedAt, rowUpdatedAt);
+                    },
+                    id);
+
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
 
     }
 
@@ -106,6 +120,9 @@ public class DatabaseTaskRepository implements TasksRepository {
     @Override
     public Task deleteTask(final String id) {
         Task deleteTask = getTask(id);
+        if (deleteTask == null) {
+            return null;
+        }
         jdbcOperations.update(
                 "DELETE FROM task WHERE id = ?", id);
         return deleteTask;
@@ -121,9 +138,16 @@ public class DatabaseTaskRepository implements TasksRepository {
     @Override
     public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
         Task newTask = getTask(id);
+        if (newTask == null) {
+            return null;
+        }
         newTask.setUpdateAt();
-        newTask.setText(updateTask.getText());
-        newTask.setStatus(updateTask.getStatus());
+        if (updateTask.getText() != null && !"".equals(updateTask.getText())) {
+            newTask.setText(updateTask.getText());
+        }
+        if (updateTask.getStatus() != null) {
+            newTask.setStatus(updateTask.getStatus());
+        }
         String text = newTask.getText();
         String status = newTask.getStatus();
         Timestamp updatedAt = newTask.getUpdatedAt();
@@ -132,5 +156,22 @@ public class DatabaseTaskRepository implements TasksRepository {
                 text, status, updatedAt, id
         );
         return newTask;
+    }
+
+    /**
+     * Return count tasks in repository
+     * @param filter status tasks
+     * @return count tasks
+     */
+    @Override
+    public int getCountAllTasks(final String filter) {
+        Integer count = jdbcOperations.queryForObject(
+                "SELECT COUNT(*) FROM task WHERE status=?",
+                (resultSet, i) -> resultSet.getInt(1),
+                filter
+        );
+        return Optional
+                .ofNullable(count)
+                .orElse(0);
     }
 }

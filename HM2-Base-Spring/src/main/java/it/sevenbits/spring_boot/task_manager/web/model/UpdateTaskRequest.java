@@ -3,15 +3,11 @@ package it.sevenbits.spring_boot.task_manager.web.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * Model for update task
  */
 public class UpdateTaskRequest {
-    @NotBlank
     private String text;
-    @NotBlank
     private String status;
 
     /**

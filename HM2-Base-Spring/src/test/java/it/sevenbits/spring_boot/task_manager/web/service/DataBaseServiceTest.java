@@ -2,7 +2,9 @@ package it.sevenbits.spring_boot.task_manager.web.service;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.repository.DatabaseTaskRepository;
+import it.sevenbits.spring_boot.task_manager.core.repository.TasksRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,33 +13,36 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DataBaseServiceTest {
-    private DataBaseService dataBaseService;
-    private DatabaseTaskRepository mockTaskRepository;
+    private TaskService dataBaseService;
+    private TasksRepository mockTaskRepository;
 
     @Before
     public void init() {
         mockTaskRepository = mock(DatabaseTaskRepository.class);
         dataBaseService = new DataBaseService(mockTaskRepository);
     }
+
     @Test
     public void testListTasks() {
-        String filter = "inbox";
+        String filter = "done";
         String order = "asc";
-        int pages = 1;
-        int size = 30;
-        List<Task> mockListTasks = mock(List.class);
-        when(mockTaskRepository.getAllTasks(filter, order, pages,size)).thenReturn(mockListTasks);
+        int page = 1;
+        int size = 15;
+        List<Task> mockList = mock(List.class);
+        when(mockTaskRepository.getAllTasks(anyString(), anyString(), anyInt(), anyInt())).thenReturn(mockList);
 
-        List<Task> result = dataBaseService.getAllTasks(filter, order, pages, size);
-        verify(mockTaskRepository, times(1)).getAllTasks(filter, order, pages, size);
-        assertSame(mockListTasks, result);
+        List<Task> answer = dataBaseService.getAllTasks(filter, order, page, size).getTasks();
+        verify(mockTaskRepository, times(1))
+                .getAllTasks(anyString(), anyString(), anyInt(), anyInt());
+        assertEquals(mockList, answer);
     }
 
     @Test
@@ -47,8 +52,8 @@ public class DataBaseServiceTest {
         when(mockTaskRepository.create(addTaskRequest)).thenReturn(task);
 
         Task result = dataBaseService.createTask(addTaskRequest);
-        verify(mockTaskRepository,times(1)).create(addTaskRequest);
-        assertEquals(task,result);
+        verify(mockTaskRepository, times(1)).create(addTaskRequest);
+        assertEquals(task, result);
 
     }
 
@@ -60,7 +65,7 @@ public class DataBaseServiceTest {
 
         Task result = dataBaseService.getTask(id);
         verify(mockTaskRepository, times(1)).getTask(id);
-        assertEquals(task,result);
+        assertEquals(task, result);
     }
 
     @Test
@@ -68,11 +73,11 @@ public class DataBaseServiceTest {
         String id = UUID.randomUUID().toString();
         Task task = mock(Task.class);
         UpdateTaskRequest updateTaskRequest = new UpdateTaskRequest("homework", "inbox");
-        when(mockTaskRepository.updateTask(id,updateTaskRequest)).thenReturn(task);
+        when(mockTaskRepository.updateTask(id, updateTaskRequest)).thenReturn(task);
 
         Task result = dataBaseService.updateTask(id, updateTaskRequest);
-        verify(mockTaskRepository, times(1)).updateTask(id,updateTaskRequest);
-        assertEquals(task,result);
+        verify(mockTaskRepository, times(1)).updateTask(id, updateTaskRequest);
+        assertEquals(task, result);
     }
 
     @Test
@@ -83,7 +88,7 @@ public class DataBaseServiceTest {
         when(task.getId()).thenReturn(id);
         Task result = dataBaseService.deleteTask(id);
         verify(mockTaskRepository, times(1)).deleteTask(id);
-        verify(task,times(1)).getId();
-        assertEquals(task,result);
+        verify(task, times(1)).getId();
+        assertEquals(task, result);
     }
 }

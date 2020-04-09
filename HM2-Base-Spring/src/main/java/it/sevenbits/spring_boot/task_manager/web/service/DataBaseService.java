@@ -3,8 +3,11 @@ package it.sevenbits.spring_boot.task_manager.web.service;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.repository.TasksRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.GetTasksMeta;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -14,6 +17,8 @@ import java.util.List;
 @Service
 public class DataBaseService implements TaskService {
     private final TasksRepository tasksRepository;
+    private static final int MIN_SIZE = 10;
+    private static final int MAX_SIZE = 50;
 
     /**
      * Create service
@@ -22,6 +27,24 @@ public class DataBaseService implements TaskService {
      */
     public DataBaseService(final TasksRepository tasksRepository) {
         this.tasksRepository = tasksRepository;
+    }
+
+    /**
+     * Method for building uri for pages
+     * @param status status tasks
+     * @param order for sorting
+     * @param page number current page
+     * @param size count tasks on page
+     * @return uri for page
+     */
+    private String buildUriFor(final String status, final String order, final int page, final int size) {
+        return UriComponentsBuilder
+                .fromPath("/tasks")
+                .queryParam("status", status)
+                .queryParam("order", order)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .toUriString();
     }
 
     /**
@@ -34,10 +57,29 @@ public class DataBaseService implements TaskService {
      * @return response with all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
-        if ("done".equals(filter) || "inbox".equals(filter) || "desc".equals(order) || "asc".equals(order)) {
-            return tasksRepository.getAllTasks(filter, order, page, size);
+    public GetAllTasksResponse getAllTasks(final String filter, final String order, final int page, final int size) {
+        if (("done".equals(filter) || "inbox".equals(filter))
+                && ("desc".equals(order) || "asc".equals(order))
+                && ((size >= MIN_SIZE) && (size <= MAX_SIZE))) {
+
+
+            int totalCount = tasksRepository.getCountAllTasks(filter);
+            int pagesCount = Math.max((int) Math.ceil((double) totalCount / size), 1);
+
+            List<Task> tasksList = tasksRepository.getAllTasks(filter, order, page, size);
+
+            String firstPage = buildUriFor(filter, order, 1, size);
+            String lastPage = buildUriFor(filter, order, pagesCount, size);
+            String nextPage = page == pagesCount
+                    ? null
+                    : buildUriFor(filter, order, page + 1, size);
+            String prevPage = page == 1
+                    ? null
+                    : buildUriFor(filter, order, page - 1, size);
+            GetTasksMeta meta = new GetTasksMeta(totalCount, filter, page, size, order, firstPage, lastPage, nextPage, prevPage);
+            return new GetAllTasksResponse(meta, tasksList);
         }
+
         return null;
     }
 
@@ -91,5 +133,10 @@ public class DataBaseService implements TaskService {
             return null;
         }
         return deleteTask;
+    }
+
+    @Override
+    public int getCountAllTasks(final String filter) {
+        return tasksRepository.getCountAllTasks(filter);
     }
 }

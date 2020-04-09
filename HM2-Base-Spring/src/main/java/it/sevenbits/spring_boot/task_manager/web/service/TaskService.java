@@ -2,9 +2,9 @@ package it.sevenbits.spring_boot.task_manager.web.service;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 
-import java.util.List;
 
 /**
  * Interface for service, which working with repositories with tasks
@@ -19,7 +19,7 @@ public interface TaskService {
      * @param size count tasks on page
      * @return response with all tasks
      */
-    List<Task> getAllTasks(String filter, String order, int page, int size);
+    GetAllTasksResponse getAllTasks(String filter, String order, int page, int size);
 
     /**
      * Method for adding task in repository creating response with added task
@@ -53,4 +53,11 @@ public interface TaskService {
      * @return empty json
      */
     Task deleteTask(String id);
+
+    /**
+     * Method for count all tasks
+     * @param filter status tasks
+     * @return count tasks for this filter
+     */
+    int getCountAllTasks(String filter);
 }

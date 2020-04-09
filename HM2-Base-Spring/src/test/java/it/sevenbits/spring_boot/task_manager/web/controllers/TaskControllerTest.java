@@ -3,6 +3,8 @@ package it.sevenbits.spring_boot.task_manager.web.controllers;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.repository.DatabaseTaskRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.GetTasksMeta;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.service.DataBaseService;
 import org.junit.Before;
@@ -15,7 +17,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -41,13 +42,12 @@ public class TaskControllerTest {
         String order = "asc";
         int pages = 1;
         int size = 30;
-        List<Task> mockTask = mock(List.class);
+        String mockJson = "{}";
+        GetAllTasksResponse mockTask = mock(GetAllTasksResponse.class);
         when(mockDataBaseService.getAllTasks(filter, order, pages, size)).thenReturn(mockTask);
-
-        ResponseEntity<List<Task>> answer = tasksController.listTasks(filter, order, pages, size);
+        ResponseEntity<GetAllTasksResponse> answer = tasksController.listTasks(filter, order, pages, size);
         verify(mockDataBaseService, times(1)).getAllTasks(filter, order, pages, size);
         assertEquals(HttpStatus.OK, answer.getStatusCode());
-        assertSame(mockTask, answer.getBody());
     }
 
 

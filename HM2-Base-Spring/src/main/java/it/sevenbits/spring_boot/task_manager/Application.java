@@ -9,6 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
     /**
+     * Private constructor
+     */
+  /*  private Application(){
+
+    }*/
+    /**
      * Method for start
      *
      * @param args - console arguments

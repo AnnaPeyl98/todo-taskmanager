@@ -2,6 +2,7 @@ package it.sevenbits.spring_boot.task_manager.web.controllers;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -31,6 +34,7 @@ import java.util.List;
 @RequestMapping("/tasks")
 public class TasksController {
     private TaskService taskService;
+    private Pattern patternId;
 
     /**
      * Constructor for creating repository
@@ -38,32 +42,33 @@ public class TasksController {
      * @param taskService service for working with repository
      */
     public TasksController(final TaskService taskService) {
+
         this.taskService = taskService;
+        patternId = Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}");
     }
 
     /**
      * Method for getting all tasks in json
      *
      * @param status status for filter
-     * @param order parameter for sort task
-     * @param page number page
-     * @param size count tasks on page
+     * @param order  parameter for sort task
+     * @param page   number page
+     * @param size   count tasks on page
      * @return all tasks
      */
     @RequestMapping(
             method = RequestMethod.GET,
             produces = "application/json")
     @ResponseBody
-    public ResponseEntity<List<Task>> listTasks(@RequestParam(name = "status", defaultValue = "inbox") final String status,
-                                                @RequestParam(name = "order", defaultValue = "desc") final String order,
-                                                @RequestParam(name = "page", defaultValue = "1") final int page,
-                                                @Valid
-                                                @Min(10)
-                                                @Max(50)
-                                                @RequestParam(name = "size", defaultValue = "25") final int size
+    public ResponseEntity<GetAllTasksResponse> listTasks(@RequestParam(name = "status", defaultValue = "inbox") final String status,
+                                                         @RequestParam(name = "order", defaultValue = "desc") final String order,
+                                                         @RequestParam(name = "page", defaultValue = "1") final int page,
+                                                         @RequestParam(name = "size", defaultValue = "25") final int size
 
     ) {
-        List<Task> taskList = taskService.getAllTasks(status, order, page, size);
+
+        GetAllTasksResponse taskList = taskService.getAllTasks(status, order, page, size);
+
         if (taskList == null) {
             return ResponseEntity
                     .badRequest()
@@ -107,19 +112,22 @@ public class TasksController {
             produces = "application/json")
     @ResponseBody
     public ResponseEntity<Task> taskForId(
-            @PathVariable("id")
-            @Valid
-            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}") final String id) {
-        Task findTask = taskService.getTask(id);
-        if (findTask == null) {
+            @PathVariable("id") final String id) {
+        Matcher matcher = patternId.matcher(id);
+        if (matcher.matches()) {
+            Task findTask = taskService.getTask(id);
+            if (findTask == null) {
+                return ResponseEntity
+                        .notFound()
+                        .build();
+            }
             return ResponseEntity
-                    .notFound()
-                    .build();
+                    .ok()
+                    .body(findTask);
         }
         return ResponseEntity
-                .ok()
-                .body(findTask);
-
+                .badRequest()
+                .build();
     }
 
     /**
@@ -136,21 +144,26 @@ public class TasksController {
             produces = "application/json")
     @ResponseBody
     public ResponseEntity<Void> changeStatus(
-            @PathVariable("id")
-            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
-            @Valid final String id,
+            @PathVariable("id") final String id,
             @RequestBody @Valid final UpdateTaskRequest task) {
-        String status = task.getStatus();
-        if (status.equals("inbox") || status.equals("done")) {
-            Task findTask = taskService.updateTask(id, task);
-            if (findTask == null) {
+        Matcher matcher = patternId.matcher(id);
+        if (matcher.matches()) {
+            Task findTask;
+            String status = task.getStatus();
+            if ((("inbox".equals(status) || "done".equals(status)) && task.getText() == null)
+                    || (status == null && task.getText() != null && !"".equals(task.getText()))
+                    || (("inbox".equals(status) || "done".equals(status)) && task.getText() != null && !"".equals(task.getText()))
+            ) {
+                findTask = taskService.updateTask(id, task);
+                if (findTask == null) {
+                    return ResponseEntity
+                            .notFound()
+                            .build();
+                }
                 return ResponseEntity
-                        .notFound()
+                        .ok()
                         .build();
             }
-            return ResponseEntity
-                    .ok()
-                    .build();
         }
         return ResponseEntity
                 .badRequest()
@@ -171,17 +184,22 @@ public class TasksController {
     )
     @ResponseBody
     public ResponseEntity<Void> deleteTask(
-            @PathVariable("id")
-            @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")
-            @Valid final String id) {
-        Task deleteTask = taskService.deleteTask(id);
-        if (deleteTask == null) {
+            @PathVariable("id") final String id) {
+        Matcher matcher = patternId.matcher(id);
+        if (matcher.matches()) {
+            Task deleteTask = taskService.deleteTask(id);
+            if (deleteTask == null) {
+                return ResponseEntity
+                        .notFound()
+                        .build();
+            }
             return ResponseEntity
-                    .notFound()
+                    .ok()
                     .build();
         }
+
         return ResponseEntity
-                .ok()
+                .badRequest()
                 .build();
     }
 }
