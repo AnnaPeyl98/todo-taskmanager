@@ -5,6 +5,7 @@ import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +59,7 @@ public class TasksController {
      */
     @RequestMapping(
             method = RequestMethod.GET,
-            produces = "application/json")
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<GetAllTasksResponse> listTasks(@RequestParam(name = "status", defaultValue = "inbox") final String status,
                                                          @RequestParam(name = "order", defaultValue = "desc") final String order,
@@ -86,8 +87,8 @@ public class TasksController {
      */
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = "application/json",
-            produces = "application/json")
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<Task> create(@RequestBody @Valid final AddTaskRequest newTask) {
         Task createdTask = taskService.createTask(newTask);
@@ -109,7 +110,7 @@ public class TasksController {
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.GET,
-            produces = "application/json")
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<Task> taskForId(
             @PathVariable("id") final String id) {
@@ -140,8 +141,8 @@ public class TasksController {
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.PATCH,
-            consumes = "application/json",
-            produces = "application/json")
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<Void> changeStatus(
             @PathVariable("id") final String id,
@@ -179,8 +180,8 @@ public class TasksController {
     @RequestMapping(
             value = "/{id}",
             method = RequestMethod.DELETE,
-            consumes = "application/json",
-            produces = "application/json"
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE
     )
     @ResponseBody
     public ResponseEntity<Void> deleteTask(
