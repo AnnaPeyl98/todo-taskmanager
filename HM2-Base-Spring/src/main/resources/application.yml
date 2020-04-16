@@ -7,3 +7,8 @@ spring:
             username: anna
             password: anna
             driver-class-name: org.postgresql.Driver
+jwt:
+  issuer: 'annapeyl@gmail.com'
+  signingKey: 'sZcps3y00xnFgpKs8rgoc6lri8uL4mqb1hJ'
+  aTokenDuration: 30
+

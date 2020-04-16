@@ -1,28 +1,27 @@
 package it.sevenbits.spring_boot.task_manager.web.controllers;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
+import it.sevenbits.spring_boot.task_manager.core.model.User;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
+import it.sevenbits.spring_boot.task_manager.web.service.whoami.WhoAmIService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,21 +35,25 @@ import java.util.regex.Pattern;
 public class TasksController {
     private TaskService taskService;
     private Pattern patternId;
+    private final WhoAmIService whoAmIService;
 
     /**
      * Constructor for creating repository
      *
      * @param taskService service for working with repository
+     * @param whoAmIService service for identification user
      */
-    public TasksController(final TaskService taskService) {
+    public TasksController(final TaskService taskService, final WhoAmIService whoAmIService) {
 
         this.taskService = taskService;
+        this.whoAmIService = whoAmIService;
         patternId = Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}");
     }
 
     /**
      * Method for getting all tasks in json
      *
+     * @param token users token
      * @param status status for filter
      * @param order  parameter for sort task
      * @param page   number page
@@ -61,13 +64,20 @@ public class TasksController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity<GetAllTasksResponse> listTasks(@RequestParam(name = "status", defaultValue = "inbox") final String status,
+    public ResponseEntity<GetAllTasksResponse> listTasks(@RequestHeader(value = "Authorization") final String token,
+                                                         @RequestParam(name = "status", defaultValue = "inbox") final String status,
                                                          @RequestParam(name = "order", defaultValue = "desc") final String order,
                                                          @RequestParam(name = "page", defaultValue = "1") final int page,
                                                          @RequestParam(name = "size", defaultValue = "25") final int size
 
     ) {
-
+        User user = whoAmIService.getCurrentUserInfo(token);
+        if (user == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build();
+        }
         GetAllTasksResponse taskList = taskService.getAllTasks(status, order, page, size);
 
         if (taskList == null) {
@@ -82,6 +92,7 @@ public class TasksController {
     /**
      * Method for adding task in repository. If field text is null or body request is empty, status will be 400 else 200
      *
+     * @param token users token
      * @param newTask task which will be add
      * @return added task in json
      */
@@ -90,7 +101,15 @@ public class TasksController {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity<Task> create(@RequestBody @Valid final AddTaskRequest newTask) {
+    public ResponseEntity<Task> create(@RequestHeader(value = "Authorization") final String token,
+                                       @RequestBody @Valid final AddTaskRequest newTask) {
+        User user = whoAmIService.getCurrentUserInfo(token);
+        if (user == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build();
+        }
         Task createdTask = taskService.createTask(newTask);
         URI location = UriComponentsBuilder.fromPath("/tasks/")
                 .path(String.valueOf(createdTask.getId()))
@@ -104,6 +123,7 @@ public class TasksController {
     /**
      * Method for get task from repository
      *
+     * @param token users token
      * @param id - id task, which we search
      * @return find task or status
      */
@@ -113,7 +133,15 @@ public class TasksController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<Task> taskForId(
+            @RequestHeader(value = "Authorization") final String token,
             @PathVariable("id") final String id) {
+        User user = whoAmIService.getCurrentUserInfo(token);
+        if (user == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build();
+        }
         Matcher matcher = patternId.matcher(id);
         if (matcher.matches()) {
             Task findTask = taskService.getTask(id);
@@ -134,6 +162,7 @@ public class TasksController {
     /**
      * Method changed status task
      *
+     * @param token users token
      * @param id   - id task, which will be change
      * @param task new status for task
      * @return status
@@ -145,8 +174,16 @@ public class TasksController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseEntity<Void> changeStatus(
+            @RequestHeader(value = "Authorization") final String token,
             @PathVariable("id") final String id,
             @RequestBody @Valid final UpdateTaskRequest task) {
+        User user = whoAmIService.getCurrentUserInfo(token);
+        if (user == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build();
+        }
         Matcher matcher = patternId.matcher(id);
         if (matcher.matches()) {
             Task findTask;
@@ -174,6 +211,7 @@ public class TasksController {
     /**
      * Method for delete task
      *
+     * @param token users token
      * @param id - id task, which will be delete
      * @return status
      */
@@ -185,7 +223,15 @@ public class TasksController {
     )
     @ResponseBody
     public ResponseEntity<Void> deleteTask(
+            @RequestHeader(value = "Authorization") final String token,
             @PathVariable("id") final String id) {
+        User user = whoAmIService.getCurrentUserInfo(token);
+        if (user == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build();
+        }
         Matcher matcher = patternId.matcher(id);
         if (matcher.matches()) {
             Task deleteTask = taskService.deleteTask(id);

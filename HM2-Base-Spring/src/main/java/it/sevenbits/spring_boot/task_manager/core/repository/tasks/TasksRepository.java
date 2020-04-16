@@ -1,4 +1,4 @@
-package it.sevenbits.spring_boot.task_manager.core.repository;
+package it.sevenbits.spring_boot.task_manager.core.repository.tasks;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;

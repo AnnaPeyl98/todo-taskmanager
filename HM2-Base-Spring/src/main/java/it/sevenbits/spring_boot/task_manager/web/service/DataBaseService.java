@@ -1,7 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.web.service;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
-import it.sevenbits.spring_boot.task_manager.core.repository.TasksRepository;
+import it.sevenbits.spring_boot.task_manager.core.repository.tasks.TasksRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
 import it.sevenbits.spring_boot.task_manager.web.model.GetTasksMeta;

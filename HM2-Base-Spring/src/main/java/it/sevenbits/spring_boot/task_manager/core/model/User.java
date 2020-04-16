@@ -1,0 +1,123 @@
+package it.sevenbits.spring_boot.task_manager.core.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Class for user data
+ */
+public class User {
+    @JsonProperty("id")
+    private final String id;
+
+    @NotBlank
+    @JsonProperty("username")
+    private final String username;
+
+    @NotBlank
+    @JsonIgnore
+    private final String password;
+
+    @JsonIgnore
+    private boolean enabled;
+
+    @NotNull
+    @JsonProperty("authorities")
+    private final List<String> authorities;
+
+    /**
+     * Create user
+     *
+     * @param id          ID of the user
+     * @param username    name of the user
+     * @param password    password of the user
+     * @param enabled     account status
+     * @param authorities user's authorities
+     */
+    @JsonCreator
+    public User(final String id,
+                final String username,
+                final String password,
+                final boolean enabled,
+                final List<String> authorities) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.authorities = authorities;
+    }
+
+    /**
+     * Get ID of the user
+     *
+     * @return user ID
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Get name of the user
+     *
+     * @return user name
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Get password of the user
+     *
+     * @return password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Get account status
+     *
+     * @return true if account is enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Get user's authorities
+     *
+     * @return authorities
+     */
+    public List<String> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(username, user.username) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(enabled, user.enabled) &&
+                Objects.equals(authorities, user.authorities);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password, enabled, authorities);
+    }
+}
+
+

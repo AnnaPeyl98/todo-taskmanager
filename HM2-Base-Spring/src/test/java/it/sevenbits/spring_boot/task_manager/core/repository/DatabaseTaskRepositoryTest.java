@@ -1,6 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.core.repository;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
+import it.sevenbits.spring_boot.task_manager.core.repository.tasks.DatabaseTaskRepository;
 import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
 import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
 import org.junit.Assert;
