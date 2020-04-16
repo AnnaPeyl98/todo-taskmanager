@@ -25,7 +25,7 @@ public class TasksDataBaseConfig {
     @FlywayDataSource
     @Qualifier("tasksDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.tasks")
-    public DataSource getDataSource() {
+    public DataSource tasksDataSource() {
         return DataSourceBuilder.create().build();
     }
 
@@ -42,16 +42,5 @@ public class TasksDataBaseConfig {
                     final DataSource tasksDataSource
     ) {
         return new JdbcTemplate(tasksDataSource);
-    }
-
-    /**
-     * The method creates instance of jdbcTemplate
-     * @param dataSource data source
-     * @return instance of jdbcTemplate
-     */
-    @Bean
-    @Qualifier("JdbcTemplate")
-    public JdbcTemplate getJdbcTemplate(final @Qualifier("tasksDataSource") DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
     }
 }

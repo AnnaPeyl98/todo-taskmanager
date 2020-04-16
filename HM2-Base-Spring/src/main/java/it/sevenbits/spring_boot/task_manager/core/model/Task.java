@@ -1,9 +1,11 @@
 package it.sevenbits.spring_boot.task_manager.core.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
@@ -17,14 +19,19 @@ public class Task {
     private String status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    @NotBlank
+    @JsonIgnore
+    private final String owner;
 
     /**
      * Created task
      *
      * @param text - text for this task
+     * @param owner id owners
      */
     @JsonCreator
-    public Task(@JsonProperty("text") final String text) {
+    public Task(@JsonProperty("text") final String text, final String owner) {
+        this.owner = owner;
         this.id = createId();
         this.text = text;
         this.status = "inbox";
@@ -35,25 +42,26 @@ public class Task {
 
     /**
      * Created task
-     *
-     * @param id       id task
+     *  @param id       id task
      * @param text     text task
      * @param status   status task
      * @param createAt date create task
      * @param updateAt date update
+     * @param owner id owners
      */
     @JsonCreator
     public Task(@JsonProperty("id") final String id,
                 @JsonProperty("text") final String text,
                 @JsonProperty("status") final String status,
                 @JsonProperty("createdAt") final Timestamp createAt,
-                @JsonProperty("updatedAt") final Timestamp updateAt
-    ) {
+                @JsonProperty("updatedAt") final Timestamp updateAt,
+                final String owner) {
         this.id = id;
         this.text = text;
         this.status = status;
         this.createdAt = createAt;
         this.updatedAt = updateAt;
+        this.owner = owner;
     }
 
     /**
@@ -134,5 +142,8 @@ public class Task {
     public void setUpdateAt() {
         Date date = new Date();
         this.updatedAt = new Timestamp(date.getTime());
+    }
+    public String getOwner() {
+        return owner;
     }
 }

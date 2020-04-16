@@ -1,8 +1,8 @@
 package it.sevenbits.spring_boot.task_manager.web.controllers;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateUserRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateUserResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateUserRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.response.UpdateUserResponse;
 import it.sevenbits.spring_boot.task_manager.web.service.users.UsersService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

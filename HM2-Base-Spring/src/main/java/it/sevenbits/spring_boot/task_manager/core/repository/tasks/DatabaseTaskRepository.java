@@ -1,8 +1,8 @@
 package it.sevenbits.spring_boot.task_manager.core.repository.tasks;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
-import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateTaskRequest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 
@@ -20,6 +20,7 @@ public class DatabaseTaskRepository implements TasksRepository {
     private static final int INDEX_STATUS = 3;
     private static final int INDEX_CREATEDAT = 4;
     private static final int INDEX_UPDATEDAT = 5;
+    private static final int INDEX_OWNER = 6;
 
     /**
      * Create repository
@@ -33,6 +34,7 @@ public class DatabaseTaskRepository implements TasksRepository {
     /**
      * Method for getting all tasks in repository
      *
+     * @param owner id owners
      * @param filter filter for status task
      * @param order  parameter for sort task
      * @param page   number page
@@ -40,11 +42,13 @@ public class DatabaseTaskRepository implements TasksRepository {
      * @return all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
+    public List<Task> getAllTasks(final String owner, final String filter, final String order, final int page, final int size) {
         String ascQuery =
-                "SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt ASC OFFSET ? LIMIT ?";
+                "SELECT id,text,status,createdAt,updatedAt, " +
+                        "owner FROM task WHERE status=? AND owner=? ORDER BY createdAt ASC OFFSET ? LIMIT ?";
         String descQuery =
-                "SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt DESC OFFSET ? LIMIT ?";
+                "SELECT id,text,status,createdAt,updatedAt, owner " +
+                        "FROM task WHERE status=? AND owner=? ORDER BY createdAt DESC OFFSET ? LIMIT ?";
         String query = "asc".equalsIgnoreCase(order) ? ascQuery : descQuery;
         int start = (page - 1) * size;
         return jdbcOperations.query(
@@ -55,9 +59,11 @@ public class DatabaseTaskRepository implements TasksRepository {
                     String status = resultSet.getString(INDEX_STATUS);
                     Timestamp createdAt = new Timestamp(resultSet.getDate(INDEX_CREATEDAT).getTime());
                     Timestamp updatedAt = new Timestamp(resultSet.getDate(INDEX_UPDATEDAT).getTime());
-                    return new Task(id, text, status, createdAt, updatedAt);
+                    String rowOwner = resultSet.getString(INDEX_OWNER);
+                    return new Task(id, text, status, createdAt, updatedAt, rowOwner);
                 },
                 filter,
+                owner,
                 start,
                 size);
     }
@@ -65,20 +71,21 @@ public class DatabaseTaskRepository implements TasksRepository {
     /**
      * Method for added task in repository
      *
+     * @param owner id owners
      * @param task - it will add
      * @return added task
      */
     @Override
-    public Task create(final AddTaskRequest task) {
-        Task newTask = new Task(task.getText());
+    public Task create(final String owner, final AddTaskRequest task) {
+        Task newTask = new Task(task.getText(), owner);
         String id = newTask.getId();
         String text = newTask.getText();
         String status = newTask.getStatus();
         Timestamp createdAt = newTask.getCreatedAt();
         Timestamp updatedAt = newTask.getUpdatedAt();
         jdbcOperations.update(
-                "INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)",
-                id, text, status, createdAt, updatedAt
+                "INSERT INTO task (id, text, status, createdAt, updatedAt, owner) VALUES (?, ?, ?, ?, ?, ?)",
+                id, text, status, createdAt, updatedAt, owner
         );
         return newTask;
     }
@@ -86,24 +93,27 @@ public class DatabaseTaskRepository implements TasksRepository {
     /**
      * Getter task for this id
      *
+     * @param owner id owners
      * @param id - id for task
      * @return task or null, if repository don`t have this id
      */
     @Override
-    public Task getTask(final String id) {
+    public Task getTask(final String owner, final String id) {
         try {
 
             return jdbcOperations.queryForObject(
-                    "SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?",
+                    "SELECT id, text, status, createdAt, updatedAt, owner FROM task WHERE id = ? AND owner=?",
                     (resultSet, i) -> {
                         String rowId = resultSet.getString(INDEX_ID);
                         String rowText = resultSet.getString(INDEX_TEXT);
                         String rowStatus = resultSet.getString(INDEX_STATUS);
                         Timestamp rowCreatedAt = new Timestamp(resultSet.getDate(INDEX_CREATEDAT).getTime());
                         Timestamp rowUpdatedAt = new Timestamp(resultSet.getDate(INDEX_UPDATEDAT).getTime());
-                        return new Task(rowId, rowText, rowStatus, rowCreatedAt, rowUpdatedAt);
+                        String rowOwner = resultSet.getString(INDEX_OWNER);
+                        return new Task(rowId, rowText, rowStatus, rowCreatedAt, rowUpdatedAt, rowOwner);
                     },
-                    id);
+                    id,
+                    owner);
 
         } catch (EmptyResultDataAccessException e) {
             return null;
@@ -114,30 +124,32 @@ public class DatabaseTaskRepository implements TasksRepository {
     /**
      * Delete task for this id
      *
+     * @param owner id owners
      * @param id - id for task
      * @return deleted task or null, if repository don`t have this id
      */
     @Override
-    public Task deleteTask(final String id) {
-        Task deleteTask = getTask(id);
+    public Task deleteTask(final String owner, final String id) {
+        Task deleteTask = getTask(owner, id);
         if (deleteTask == null) {
             return null;
         }
         jdbcOperations.update(
-                "DELETE FROM task WHERE id = ?", id);
+                "DELETE FROM task WHERE id = ? AND owner = ?", id, owner);
         return deleteTask;
     }
 
     /**
      * Update task in repository
      *
+     * @param owner id owners
      * @param id         id task, which will be update
      * @param updateTask new informations
      * @return updated task
      */
     @Override
-    public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
-        Task newTask = getTask(id);
+    public Task updateTask(final String owner, final String id, final UpdateTaskRequest updateTask) {
+        Task newTask = getTask(owner, id);
         if (newTask == null) {
             return null;
         }
@@ -152,23 +164,25 @@ public class DatabaseTaskRepository implements TasksRepository {
         String status = newTask.getStatus();
         Timestamp updatedAt = newTask.getUpdatedAt();
         jdbcOperations.update(
-                "UPDATE task SET text = ?, status = ?, updatedAt = ? WHERE id = ?",
-                text, status, updatedAt, id
+                "UPDATE task SET text = ?, status = ?, updatedAt = ? WHERE id = ? AND owner = ?",
+                text, status, updatedAt, id, owner
         );
         return newTask;
     }
 
     /**
      * Return count tasks in repository
+     * @param owner id owners
      * @param filter status tasks
      * @return count tasks
      */
     @Override
-    public int getCountAllTasks(final String filter) {
+    public int getCountAllTasks(final String owner, final String filter) {
         Integer count = jdbcOperations.queryForObject(
-                "SELECT COUNT(*) FROM task WHERE status=?",
+                "SELECT COUNT(*) FROM task WHERE status=? and owner = ?",
                 (resultSet, i) -> resultSet.getInt(1),
-                filter
+                filter,
+                owner
         );
         return Optional
                 .ofNullable(count)

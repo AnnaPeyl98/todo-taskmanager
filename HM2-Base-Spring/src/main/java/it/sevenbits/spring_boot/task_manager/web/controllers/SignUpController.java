@@ -1,7 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.web.controllers;
 
-import it.sevenbits.spring_boot.task_manager.web.model.SignUpRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.SignUpResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.request.SignUpRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.response.SignUpResponse;
 import it.sevenbits.spring_boot.task_manager.web.service.signup.SignUpService;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;

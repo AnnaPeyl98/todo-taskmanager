@@ -3,7 +3,7 @@ package it.sevenbits.spring_boot.task_manager.web.service.signin;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
 import it.sevenbits.spring_boot.task_manager.core.repository.users.UsersRepository;
-import it.sevenbits.spring_boot.task_manager.web.model.SignInRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.SignInRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

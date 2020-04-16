@@ -1,8 +1,8 @@
 package it.sevenbits.spring_boot.task_manager.web.controllers;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
-import it.sevenbits.spring_boot.task_manager.web.model.SignInRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.SignInResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.request.SignInRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.response.SignInResponse;
 import it.sevenbits.spring_boot.task_manager.web.service.signin.SignInService;
 import it.sevenbits.spring_boot.task_manager.web.service.tokens.JwtTokenService;
 import org.springframework.http.HttpStatus;

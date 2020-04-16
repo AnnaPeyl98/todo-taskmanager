@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 
 /**
@@ -27,13 +26,16 @@ public class RepositoryConfiguration {
         return new DatabaseTaskRepository(jdbcOperations);
     }
     /**
-     * The method creates instance of users repository
-     * @param jdbcTemplate instance of jdbcTemplate
-     * @return instance of the books repository
+     * Create users repository, connected to database
+     *
+     * @param jdbcOperations class-wrapper for better work with database
+     * @return repository with users
      */
     @Bean
-    public UsersRepository usersRepository(final @Qualifier("JdbcTemplate") JdbcTemplate jdbcTemplate) {
-        return new DatabaseUsersRepository(jdbcTemplate);
+    @Qualifier("usersRepository")
+    public UsersRepository usersRepository(
+            @Qualifier(value = "tasksJdbcOperations") final JdbcOperations jdbcOperations) {
+        return new DatabaseUsersRepository(jdbcOperations);
     }
 
 }

@@ -1,8 +1,8 @@
 package it.sevenbits.spring_boot.task_manager.core.repository.tasks;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
-import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateTaskRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return all tasks
      */
     @Override
-    public List<Task> getAllTasks(final String filter, final String order, final int page, final int size) {
+    public List<Task> getAllTasks(final String owner, final String filter, final String order, final int page, final int size) {
         return new ArrayList<>(tasks.values()).stream().filter(i -> i.getStatus().equals(filter)).collect(Collectors.toList());
     }
 
@@ -33,8 +33,8 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return added task
      */
     @Override
-    public Task create(final AddTaskRequest task) {
-        Task newTask = new Task(task.getText());
+    public Task create(final String owner, final AddTaskRequest task) {
+        Task newTask = new Task(task.getText(), owner);
         tasks.put(newTask.getId(), newTask);
         return newTask;
     }
@@ -46,7 +46,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return task or null, if repository don`t have this id
      */
     @Override
-    public Task getTask(final String id) {
+    public Task getTask(final String owner, final String id) {
         return tasks.get(id);
     }
 
@@ -57,7 +57,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return deleted task or null, if repository don`t have this id
      */
     @Override
-    public Task deleteTask(final String id) {
+    public Task deleteTask(final String owner, final String id) {
         return tasks.remove(id);
     }
 
@@ -69,8 +69,8 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return updated task
      */
     @Override
-    public Task updateTask(final String id, final UpdateTaskRequest updateTask) {
-        Task findTask = getTask(id);
+    public Task updateTask(final String owner, final String id, final UpdateTaskRequest updateTask) {
+        Task findTask = getTask(owner, id);
         if (findTask == null) {
             return null;
         }
@@ -84,7 +84,7 @@ public class SimpleTasksRepository implements TasksRepository {
      * @return count tasks
      */
     @Override
-    public int getCountAllTasks(final String filter) {
+    public int getCountAllTasks(final String owner, final String filter) {
         return tasks.size();
     }
 }

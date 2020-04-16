@@ -2,8 +2,8 @@ package it.sevenbits.spring_boot.task_manager.web.service.users;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
 import it.sevenbits.spring_boot.task_manager.core.repository.users.UsersRepository;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateUserRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateUserResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateUserRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.response.UpdateUserResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;

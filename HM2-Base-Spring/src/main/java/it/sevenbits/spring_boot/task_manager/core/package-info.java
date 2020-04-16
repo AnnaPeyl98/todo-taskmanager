@@ -1,4 +1,4 @@
 /**
- *Package for classes which works with tasks
+ *Package for repository
  */
 package it.sevenbits.spring_boot.task_manager.core;

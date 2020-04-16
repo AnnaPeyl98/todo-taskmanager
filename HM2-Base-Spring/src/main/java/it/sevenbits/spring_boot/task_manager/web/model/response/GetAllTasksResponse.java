@@ -1,7 +1,8 @@
-package it.sevenbits.spring_boot.task_manager.web.model;
+package it.sevenbits.spring_boot.task_manager.web.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
+import it.sevenbits.spring_boot.task_manager.web.model.GetTasksMeta;
 
 import java.util.List;
 import java.util.Objects;

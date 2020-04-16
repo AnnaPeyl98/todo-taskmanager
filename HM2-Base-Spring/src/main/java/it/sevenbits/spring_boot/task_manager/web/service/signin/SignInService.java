@@ -1,7 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.web.service.signin;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
-import it.sevenbits.spring_boot.task_manager.web.model.SignInRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.SignInRequest;
 
 /**
  * Interface for validating sign in user authentication

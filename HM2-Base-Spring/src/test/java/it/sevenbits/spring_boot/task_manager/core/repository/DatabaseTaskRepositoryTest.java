@@ -2,8 +2,8 @@ package it.sevenbits.spring_boot.task_manager.core.repository;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.repository.tasks.DatabaseTaskRepository;
-import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateTaskRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +27,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class DatabaseTaskRepositoryTest {
-    JdbcOperations mockJdbcOperations;
-    DatabaseTaskRepository databaseTaskRepository;
+    private JdbcOperations mockJdbcOperations;
+    private DatabaseTaskRepository databaseTaskRepository;
+    private String owner;
 
     @Before
     public void init(){
         mockJdbcOperations = mock(JdbcOperations.class);
         databaseTaskRepository = new DatabaseTaskRepository(mockJdbcOperations);
+        owner = UUID.randomUUID().toString();
     }
     @Test
     public void testGetAllTasksOrderDESC(){
@@ -45,12 +47,13 @@ public class DatabaseTaskRepositoryTest {
         int start = (pages-1)*size;
         when(mockJdbcOperations.query(anyString(),any(RowMapper.class), anyVararg())).thenReturn(mockAllTask);
 
-        List<Task> expectedAllTask = databaseTaskRepository.getAllTasks(filter,order,pages,size);
+        List<Task> expectedAllTask = databaseTaskRepository.getAllTasks(owner,filter,order,pages,size);
 
         verify(mockJdbcOperations,times(1)).query(
-                eq("SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt DESC OFFSET ? LIMIT ?"),
+                eq("SELECT id,text,status,createdAt,updatedAt, owner FROM task WHERE status=? AND owner=? ORDER BY createdAt DESC OFFSET ? LIMIT ?"),
                 any(RowMapper.class),
                 eq(filter),
+                eq(owner),
                 eq(start),
                 eq(size)
 
@@ -67,12 +70,13 @@ public class DatabaseTaskRepositoryTest {
         List<Task> mockAllTask = mock(List.class);
         when(mockJdbcOperations.query(anyString(),any(RowMapper.class), anyVararg())).thenReturn(mockAllTask);
 
-        List<Task> expectedAllTask = databaseTaskRepository.getAllTasks(filter,order,pages,size);
+        List<Task> expectedAllTask = databaseTaskRepository.getAllTasks(owner,filter,order,pages,size);
 
         verify(mockJdbcOperations,times(1)).query(
-                eq( "SELECT id,text,status,createdAt,updatedAt FROM task WHERE status=? ORDER BY createdAt ASC OFFSET ? LIMIT ?"),
+                eq( "SELECT id,text,status,createdAt,updatedAt, owner FROM task WHERE status=? AND owner=? ORDER BY createdAt ASC OFFSET ? LIMIT ?"),
                 any(RowMapper.class),
                 eq(filter),
+                eq(owner),
                 eq(start),
                 eq(size)
         );
@@ -87,21 +91,23 @@ public class DatabaseTaskRepositoryTest {
                 anyString(),
                 anyString(),
                 any(Date.class),
-                any(Date.class)))
+                any(Date.class),
+                anyString()))
                 .thenReturn(1);
 
-        Task task = databaseTaskRepository.create(addTaskRequest);
+        Task task = databaseTaskRepository.create(owner,addTaskRequest);
         assertNotNull(task);
         assertEquals(addTaskRequest.getText(),task.getText());
         assertEquals("inbox", task.getStatus());
 
         verify(mockJdbcOperations, times(1)).update(
-                eq("INSERT INTO task (id, text, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"),
+                eq("INSERT INTO task (id, text, status, createdAt, updatedAt, owner) VALUES (?, ?, ?, ?, ?, ?)"),
                 eq(task.getId()),
                 eq(task.getText()),
                 eq(task.getStatus()),
                 eq(task.getCreatedAt()),
-                eq(task.getUpdatedAt())
+                eq(task.getUpdatedAt()),
+                        eq(owner)
         );
 
     }
@@ -112,12 +118,13 @@ public class DatabaseTaskRepositoryTest {
 
         when(mockJdbcOperations.queryForObject(anyString(), any(RowMapper.class), anyVararg())).thenReturn(task);
 
-        Task expectedTask = databaseTaskRepository.getTask(id);
+        Task expectedTask = databaseTaskRepository.getTask(owner, id);
 
         verify(mockJdbcOperations, times(1)).queryForObject(
-                eq("SELECT id, text, status, createdAt, updatedAt FROM task WHERE id = ?"),
+                eq("SELECT id, text, status, createdAt, updatedAt, owner FROM task WHERE id = ? AND owner=?"),
                 any(RowMapper.class),
-                eq(id)
+                eq(id),
+                eq(owner)
         );
         assertEquals(task,expectedTask);
 
@@ -129,11 +136,12 @@ public class DatabaseTaskRepositoryTest {
         when(mockJdbcOperations.queryForObject(anyString(), any(RowMapper.class), anyVararg())).thenReturn(task);
         when(mockJdbcOperations.update(anyString(),anyString())).thenReturn(1);
 
-        Task expectedTask = databaseTaskRepository.deleteTask(id);
+        Task expectedTask = databaseTaskRepository.deleteTask(owner, id);
 
         verify(mockJdbcOperations,times(1)).update(
-                eq("DELETE FROM task WHERE id = ?"),
-                eq(id)
+                eq("DELETE FROM task WHERE id = ? AND owner = ?"),
+                eq(id),
+                eq(owner)
         );
         assertEquals(task, expectedTask);
     }
@@ -152,16 +160,17 @@ public class DatabaseTaskRepositoryTest {
         when(task.getUpdatedAt()).thenReturn(updatedAt);
         UpdateTaskRequest updateTaskRequest = new UpdateTaskRequest(text,status);
         when(mockJdbcOperations.queryForObject(anyString(), any(RowMapper.class), anyVararg())).thenReturn(task);
-        when(mockJdbcOperations.update(anyString(),anyString(),any(Date.class),anyString())).thenReturn(1);
+        when(mockJdbcOperations.update(anyString(),anyString(),any(Date.class),anyString(), anyString())).thenReturn(1);
 
-        Task expectedTask = databaseTaskRepository.updateTask(id,updateTaskRequest);
+        Task expectedTask = databaseTaskRepository.updateTask(owner,id,updateTaskRequest);
 
         verify(mockJdbcOperations,times(1)).update(
-                eq("UPDATE task SET text = ?, status = ?, updatedAt = ? WHERE id = ?"),
+                eq("UPDATE task SET text = ?, status = ?, updatedAt = ? WHERE id = ? AND owner = ?"),
                 eq(text),
                 eq(status),
                 eq(updatedAt),
-                eq(id)
+                eq(id),
+                eq(owner)
         );
         assertEquals(task, expectedTask);
     }

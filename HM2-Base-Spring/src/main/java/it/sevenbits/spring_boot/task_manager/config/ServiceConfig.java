@@ -2,8 +2,9 @@ package it.sevenbits.spring_boot.task_manager.config;
 
 import it.sevenbits.spring_boot.task_manager.core.repository.tasks.TasksRepository;
 import it.sevenbits.spring_boot.task_manager.core.repository.users.UsersRepository;
-import it.sevenbits.spring_boot.task_manager.web.service.DataBaseService;
-import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
+import it.sevenbits.spring_boot.task_manager.web.model.ValidatorSizePage;
+import it.sevenbits.spring_boot.task_manager.web.service.tasks.DataBaseService;
+import it.sevenbits.spring_boot.task_manager.web.service.tasks.TaskService;
 import it.sevenbits.spring_boot.task_manager.web.service.signin.SignInService;
 import it.sevenbits.spring_boot.task_manager.web.service.signin.SignInServiceImpl;
 import it.sevenbits.spring_boot.task_manager.web.service.signup.SignUpService;
@@ -27,12 +28,14 @@ public class ServiceConfig {
     /**
      * Create Service
      *
-     * @param tasksRepository repository for tasks
+     * @param tasksRepository repository for
+     * @param validatorSizePage validation for size
      * @return service for this repository
      */
     @Bean
-    public TaskService taskService(final TasksRepository tasksRepository) {
-        return new DataBaseService(tasksRepository);
+    public TaskService taskService(final TasksRepository tasksRepository,
+                                   final ValidatorSizePage validatorSizePage) {
+        return new DataBaseService(tasksRepository, validatorSizePage);
     }
 
     /**

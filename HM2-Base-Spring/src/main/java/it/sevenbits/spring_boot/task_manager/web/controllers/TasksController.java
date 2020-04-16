@@ -2,10 +2,10 @@ package it.sevenbits.spring_boot.task_manager.web.controllers;
 
 import it.sevenbits.spring_boot.task_manager.core.model.Task;
 import it.sevenbits.spring_boot.task_manager.core.model.User;
-import it.sevenbits.spring_boot.task_manager.web.model.AddTaskRequest;
-import it.sevenbits.spring_boot.task_manager.web.model.GetAllTasksResponse;
-import it.sevenbits.spring_boot.task_manager.web.model.UpdateTaskRequest;
-import it.sevenbits.spring_boot.task_manager.web.service.TaskService;
+import it.sevenbits.spring_boot.task_manager.web.model.request.AddTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.response.GetAllTasksResponse;
+import it.sevenbits.spring_boot.task_manager.web.model.request.UpdateTaskRequest;
+import it.sevenbits.spring_boot.task_manager.web.service.tasks.TaskService;
 import it.sevenbits.spring_boot.task_manager.web.service.whoami.WhoAmIService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +33,14 @@ import java.util.regex.Pattern;
 @Validated
 @RequestMapping("/tasks")
 public class TasksController {
+    private final WhoAmIService whoAmIService;
     private TaskService taskService;
     private Pattern patternId;
-    private final WhoAmIService whoAmIService;
 
     /**
      * Constructor for creating repository
      *
-     * @param taskService service for working with repository
+     * @param taskService   service for working with repository
      * @param whoAmIService service for identification user
      */
     public TasksController(final TaskService taskService, final WhoAmIService whoAmIService) {
@@ -53,7 +53,7 @@ public class TasksController {
     /**
      * Method for getting all tasks in json
      *
-     * @param token users token
+     * @param token  users token
      * @param status status for filter
      * @param order  parameter for sort task
      * @param page   number page
@@ -64,11 +64,16 @@ public class TasksController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity<GetAllTasksResponse> listTasks(@RequestHeader(value = "Authorization") final String token,
-                                                         @RequestParam(name = "status", defaultValue = "inbox") final String status,
-                                                         @RequestParam(name = "order", defaultValue = "desc") final String order,
-                                                         @RequestParam(name = "page", defaultValue = "1") final int page,
-                                                         @RequestParam(name = "size", defaultValue = "25") final int size
+    public ResponseEntity<GetAllTasksResponse> listTasks(
+            @RequestHeader(value = "Authorization") final String token,
+            @RequestParam(name = "status",
+                    defaultValue = "${configuration.meta.status}") final String status,
+            @RequestParam(name = "order",
+                    defaultValue = "${configuration.meta.order}") final String order,
+            @RequestParam(name = "page",
+                    defaultValue = "${configuration.meta.start-page}") final int page,
+            @RequestParam(name = "size",
+                    defaultValue = "${configuration.meta.page-size}") final int size
 
     ) {
         User user = whoAmIService.getCurrentUserInfo(token);
@@ -78,7 +83,7 @@ public class TasksController {
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .build();
         }
-        GetAllTasksResponse taskList = taskService.getAllTasks(status, order, page, size);
+        GetAllTasksResponse taskList = taskService.getAllTasks(user.getId(), status, order, page, size);
 
         if (taskList == null) {
             return ResponseEntity
@@ -92,7 +97,7 @@ public class TasksController {
     /**
      * Method for adding task in repository. If field text is null or body request is empty, status will be 400 else 200
      *
-     * @param token users token
+     * @param token   users token
      * @param newTask task which will be add
      * @return added task in json
      */
@@ -110,7 +115,7 @@ public class TasksController {
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .build();
         }
-        Task createdTask = taskService.createTask(newTask);
+        Task createdTask = taskService.createTask(user.getId(), newTask);
         URI location = UriComponentsBuilder.fromPath("/tasks/")
                 .path(String.valueOf(createdTask.getId()))
                 .build()
@@ -124,7 +129,7 @@ public class TasksController {
      * Method for get task from repository
      *
      * @param token users token
-     * @param id - id task, which we search
+     * @param id    - id task, which we search
      * @return find task or status
      */
     @RequestMapping(
@@ -144,7 +149,7 @@ public class TasksController {
         }
         Matcher matcher = patternId.matcher(id);
         if (matcher.matches()) {
-            Task findTask = taskService.getTask(id);
+            Task findTask = taskService.getTask(user.getId(), id);
             if (findTask == null) {
                 return ResponseEntity
                         .notFound()
@@ -163,8 +168,8 @@ public class TasksController {
      * Method changed status task
      *
      * @param token users token
-     * @param id   - id task, which will be change
-     * @param task new status for task
+     * @param id    - id task, which will be change
+     * @param task  new status for task
      * @return status
      */
     @RequestMapping(
@@ -192,7 +197,7 @@ public class TasksController {
                     || (status == null && task.getText() != null && !"".equals(task.getText()))
                     || (("inbox".equals(status) || "done".equals(status)) && task.getText() != null && !"".equals(task.getText()))
             ) {
-                findTask = taskService.updateTask(id, task);
+                findTask = taskService.updateTask(user.getId(), id, task);
                 if (findTask == null) {
                     return ResponseEntity
                             .notFound()
@@ -212,7 +217,7 @@ public class TasksController {
      * Method for delete task
      *
      * @param token users token
-     * @param id - id task, which will be delete
+     * @param id    - id task, which will be delete
      * @return status
      */
     @RequestMapping(
@@ -234,7 +239,7 @@ public class TasksController {
         }
         Matcher matcher = patternId.matcher(id);
         if (matcher.matches()) {
-            Task deleteTask = taskService.deleteTask(id);
+            Task deleteTask = taskService.deleteTask(user.getId(), id);
             if (deleteTask == null) {
                 return ResponseEntity
                         .notFound()

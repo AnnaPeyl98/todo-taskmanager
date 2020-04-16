@@ -1,4 +1,4 @@
-package it.sevenbits.spring_boot.task_manager.web.model;
+package it.sevenbits.spring_boot.task_manager.web.model.response;
 
 import java.util.Objects;
 

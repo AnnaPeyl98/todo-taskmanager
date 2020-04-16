@@ -1,7 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.core.repository.users;
 
 import it.sevenbits.spring_boot.task_manager.core.model.User;
-import it.sevenbits.spring_boot.task_manager.web.model.SignUpRequest;
+import it.sevenbits.spring_boot.task_manager.web.model.request.SignUpRequest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;

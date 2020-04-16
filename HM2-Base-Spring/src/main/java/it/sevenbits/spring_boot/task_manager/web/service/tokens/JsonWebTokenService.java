@@ -1,7 +1,7 @@
 package it.sevenbits.spring_boot.task_manager.web.service.tokens;
 
-import io.jsonwebtoken.SignatureAlgorithm;
 
+import io.jsonwebtoken.security.Keys;
 import it.sevenbits.spring_boot.task_manager.config.JwtSettings;
 import it.sevenbits.spring_boot.task_manager.core.model.User;
 import it.sevenbits.spring_boot.task_manager.web.security.model.AuthenticatedJwtToken;
@@ -55,7 +55,7 @@ public class JsonWebTokenService implements JwtTokenService {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, settings.getTokenSigningKey())
+                .signWith(Keys.hmacShaKeyFor(settings.getTokenSigningKey().getBytes()))
                 .compact();
     }
 
@@ -67,7 +67,7 @@ public class JsonWebTokenService implements JwtTokenService {
     @Override
     public Authentication parseToken(final String token) {
         Jws<Claims> claims = Jwts.parser()
-                .setSigningKey(settings.getTokenSigningKey())
+                .setSigningKey(Keys.hmacShaKeyFor(settings.getTokenSigningKey().getBytes()))
                 .parseClaimsJws(token);
 
         String subject = claims.getBody().getSubject();
