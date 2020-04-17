@@ -37,6 +37,7 @@ java -jar name_file.jar
 when name_file.jar - your jar-file this project.
 
 ## API
+<https://app.swaggerhub.com/apis-docs/pawlaz/base-web-development-restfull-task-manager/6.0.0>
 You can send the following requests:
 1. **This request with method GET return all tasks**
     ```$xslt
