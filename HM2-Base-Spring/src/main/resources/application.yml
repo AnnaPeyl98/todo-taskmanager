@@ -1,6 +1,8 @@
 server:
     port: 8080
 spring:
+    profiles:
+      active: DEVELOP
     datasource:
         tasks:
             jdbcUrl: jdbc:postgresql://localhost:5432/eisetasks
@@ -20,3 +22,9 @@ configuration:
     page-size: 25
     min-page-size: 10
     max-page-size: 50
+
+logging:
+  path: log
+  file: app_logs.log
+app:
+  name: 'taskmanager'

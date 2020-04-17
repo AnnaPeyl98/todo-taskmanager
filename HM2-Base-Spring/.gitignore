@@ -5,6 +5,7 @@
 
 /target
 /bin
+/log
 
 *.log.*
 *.log
