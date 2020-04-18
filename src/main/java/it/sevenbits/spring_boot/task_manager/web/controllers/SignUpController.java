@@ -53,7 +53,7 @@ public class SignUpController {
                     .build();
         }
         return ResponseEntity
-                .noContent()
+                .ok()
                 .build();
     }
 }

@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         JwtAuthFilter authFilter = new HeaderJwtAuthFilter(notSignInPageMatcher);
         http.addFilterBefore(authFilter, FilterSecurityInterceptor.class);
 
-        http
+        http.cors().and()
                 .authorizeRequests().antMatchers("/signin").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/signup").permitAll()

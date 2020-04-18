@@ -18,10 +18,10 @@ public class CorsConfig {
     @Value("${corsHeaders.allowOrigins:*}")
     private String allowOrigins;
 
-    @Value("${corsHeaders.allowCredentials:true}")
+    @Value("${corsHeaders.allowCredentials:false}")
     private boolean allowCredentials = true;
 
-    @Value("${corsHeaders.allowMethods:GET,POST,OPTIONS}")
+    @Value("${corsHeaders.allowMethods:GET,POST,OPTIONS, DELETE, PATCH}")
     private String allowMethods;
 
     @Value("${corsHeaders.allowHeaders:Authorization,Origin,Accept,Key,DNT,Keep-Alive,User-Agent,X-Requested-With," +
@@ -40,8 +40,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(final CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(delimiter.split(allowOrigins))
-                        .allowCredentials(allowCredentials)
+                        .allowedOrigins("*")
                         .allowedMethods(delimiter.split(allowMethods))
                         .allowedHeaders(delimiter.split(allowHeaders));
             }
